@@ -2,48 +2,197 @@ openapi: "3.0.3"
 
 info:
   version: 1.0.0
-  title: Hello World
+  title: HMRC third party payments
 
 servers:
-  - url: https://test-api.service.hmrc.gov.uk/hello-world
+  - url: https://test-api.service.hmrc.gov.uk/third-party-payments-external-api
     description: Sandbox
-  - url: https://api.service.hmrc.gov.uk/hello-world
+  - url: https://api.service.hmrc.gov.uk/third-party-payments-external-api
     description: Production
 
 components:
+  securitySchemes:
+    userRestricted:
+      type: oauth2
+      description: |
+        HMRC supports OAuth 2.0 for authenticating user restricted API requests using an OAuth 2.0 Bearer Token in the AUTHORIZATION header.
+        See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints for details.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
+          scopes:
+            status: Update the status of fraud check
+    applicationRestricted:
+      type: oauth2
+      description: |
+        HMRC supports OAuth 2.0 for authenticating application restricted API requests using an OAuth 2.0 Bearer Token in the AUTHORIZATION header.
+        See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/application-restricted-endpoints for details.
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          scopes: { }
   parameters:
     acceptHeader:
       name: Accept
       in: header
       schema:
         type: string
-        enum: [
-          "application/vnd.hmrc.1.0+json",
-          "application/vnd.hmrc.1.0+xml"
-        ]
+        enum: ["application/vnd.hmrc.1.0+json"]
       required: true
 
 paths:
-  /hello-world:
-    get:
-      summary: Placeholder hello world endpoint
-      description: |
-        An endpoint that returns "Hello world"
-      tags:
-        - third-party-payments-external-api
-      parameters:
-        - $ref: '#/components/parameters/acceptHeader'
+  /pay:
+    post:
+      description: Begin a payment journey
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              title: POST pay request schema
+              description: The Json describing an HMRC third party payment /pay POST payload
+              type: object
+              required: [ tax-regime, reference, amount, vendor-journey-id ]
+              properties:
+                tax-regime:
+                  #We need to sort out the acceptable regimes, e.g. which regime will SA actually go through?
+                  description: The tax regime under which the liability has arisen. One of a fixed set.
+                  enum: [ SA, CT, VAT ]
+
+                reference:
+                  description: The reference identifying the tax liability.
+                  type: string
+                  example: "1097172564"
+
+                amount:
+                  description: The amount to be paid in pennies, so £12.34 is 1234, must be greater than 0.
+                  type: integer
+                  minimum: 0
+                  exclusiveMinimum: true
+
+                vendor-journey-id:
+                  description: Your identifier for this journey. Must be a UUID (version 4, variant 2).
+                  type: string
+                  format: uuid
+                  example: a218f71d-9bf2-438e-851c-71d50866c2e9
+
+                return-url:
+                  description: Optional. If this is present we will POST JSON back to the Vendor giving the outcome of the  journey.
+                  type: string
+                  format: uri
+
+                back-url:
+                  description: Optional. If this is present we will Redirect the Customer browser to this URL at the end of the journey with a GET.
+                  type: string
+                  format: uri
+
+
       responses:
-        200:
-          description: "OK Response"
+        201:
+          description: "Created"
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  redirect-url:
                     type: string
+                    description: The url to direct the customet browser to, to initiate the customer payment journey
               example:
-                "Hello world"
-      security:
-        - {}
+                {
+                  "redirect-url": "https://tax.gov.uk/third-party-payment/jhdugiuygdwuygsxajvbh"
+                }
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The url to direct the customer browser to, to initiate the customer payment journey
+              example:
+                {
+                  "error": "Mandatory reference field was omitted."
+                }
+  /find:
+    get:
+      parameters:
+        - in: query
+          name: ss
+          schema:
+            type: string
+          description: Search scope. One of a fixed set TBS.
+
+        - in: query
+          name: st
+          schema:
+            type: string
+          description: The thing being searched for - typically the reference
+
+        - in: query
+          name: jid
+          schema:
+            type: string
+            format: uuid
+          description: The journey identifier supplied by Vendor when the payment was set up
+
+      responses:
+        200:
+          description: "Ok"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tax-regime:
+                    # Note that this is not the final set of regimes
+                    type: string
+                    description: The tax regime under which the liability has arisen. One of a fixed set.
+                    enum: [ SA, CT, VAT ]
+
+                  reference:
+                    type: string
+                    description: The reference identifying the tax liability.
+
+                  amount:
+                    description: Represents the amount actually paid. It may be zero.
+                    type: integer
+                    minimum: 0
+                    exclusiveMinimum: false
+
+                  jid:
+                    description: The vendor journey Id. Repeated back.
+                    type: string
+                    format: uuid
+
+              example:
+                {
+                  "tax-regime": "SA",
+                  "reference": "1097172564",
+                  "amount": 1453,
+                  "jid": a218f71d-9bf2-438e-851c-71d50866c2e9
+                }
+        401:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The url to direct the customer browser to, to initiate the customer payment journey
+              example:
+                {
+                  "error": "Mandatory ss query was ommited."
+                }
+        403:
+          description: "Not found"
+
+
+
