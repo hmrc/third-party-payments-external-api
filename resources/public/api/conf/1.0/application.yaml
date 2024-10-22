@@ -5,9 +5,9 @@ info:
   title: HMRC third party payments
 
 servers:
-  - url: https://test-api.service.hmrc.gov.uk/third-party-payments-external-api
+  - url: https://test-api.service.hmrc.gov.uk/payments/make-payment
     description: Sandbox
-  - url: https://api.service.hmrc.gov.uk/third-party-payments-external-api
+  - url: https://api.service.hmrc.gov.uk/payments/make-payment
     description: Production
 
 components:
@@ -119,7 +119,7 @@ paths:
                 {
                   "error": "Mandatory reference field was omitted."
                 }
-  /find:
+  /status:
     get:
       parameters:
         - in: query

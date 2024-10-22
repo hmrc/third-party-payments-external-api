@@ -4,7 +4,7 @@
   "api": {
     "name": "HMRC third party payments",
     "description": "TBS Rocco",
-    "context": "third-party-payments-external-api",
+    "context": "/payments/make-payment",
     "categories": ["OTHER"],
     "versions": [
       {
