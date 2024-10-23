@@ -3,6 +3,7 @@ openapi: "3.0.3"
 info:
   version: 1.0.0
   title: HMRC third party payments
+  description: TBS Rocco
 
 servers:
   - url: https://test-api.service.hmrc.gov.uk/payments/make-payment
@@ -45,9 +46,9 @@ components:
 paths:
   /pay:
     post:
-      description: Begin a payment journey
+      description: Begin a payment journey. TBS Rocco
       requestBody:
-        description: Optional description in *Markdown*
+        description: Optional description in *Markdown* TBS Rocco
         required: true
         content:
           application/json:
@@ -92,7 +93,7 @@ paths:
 
       responses:
         201:
-          description: "Created"
+          description: "Created TBS Rocco"
           content:
             application/json:
               schema:
@@ -106,7 +107,7 @@ paths:
                   "redirect-url": "https://tax.gov.uk/third-party-payment/jhdugiuygdwuygsxajvbh"
                 }
         400:
-          description: "Bad Request"
+          description: "Bad Request TBS Rocco"
           content:
             application/json:
               schema:
@@ -121,6 +122,7 @@ paths:
                 }
   /status:
     get:
+      description: TBS Rocco
       parameters:
         - in: query
           name: ss
@@ -143,7 +145,7 @@ paths:
 
       responses:
         200:
-          description: "Ok"
+          description: "Ok TBS Rocco"
           content:
             application/json:
               schema:
@@ -178,7 +180,7 @@ paths:
                   "jid": a218f71d-9bf2-438e-851c-71d50866c2e9
                 }
         401:
-          description: "Bad Request"
+          description: "Bad Request TBS Rocco"
           content:
             application/json:
               schema:
@@ -192,7 +194,7 @@ paths:
                   "error": "Mandatory ss query was ommited."
                 }
         403:
-          description: "Not found"
+          description: "Not found TBS Rocco"
 
 
 
