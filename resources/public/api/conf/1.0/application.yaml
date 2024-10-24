@@ -3,7 +3,7 @@ openapi: "3.0.3"
 info:
   version: 1.0.0
   title: HMRC third party payments
-  description: TBS Rocco
+  description: This accepts payments from outside of HMRC
 
 servers:
   - url: https://test-api.service.hmrc.gov.uk/payments/make-payment
