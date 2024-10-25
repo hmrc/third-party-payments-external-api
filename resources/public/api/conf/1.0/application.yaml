@@ -19,7 +19,10 @@ info:
     post JSON of the payment to this endpoint [NB. Security?] that gives details about the payment including the amount
     the customer actually paid. Note that this amount may be zero.
     
-    The /status endpoint can be used with roundtrip workflows as well.
+    The /status endpoint can be used with roundtrip workflows as well. Note that journey details are not permanently
+    stored at HMRC as they contain sensitive information. If the status for a journey can't be found (response 403)
+    it indicates either that a journey with the submitted details was not made, or that the record has been deleted. 
+    Typical lifetimes for journey storage are not yet determined.
 
 
 servers:
@@ -65,6 +68,7 @@ paths:
     post:
       description: |
         Begin a payment journey.
+        
         On a successful call to the /pay endpoint to start the payment process the
         API user will receive JSON containing a redirection URL in return. They will then 
         redirect their customer's browser to that URL. This starts the journey for the customer.
@@ -108,11 +112,12 @@ paths:
                   type: string
                   description: The tax regime under which the liability has arisen. One of a fixed set.
                   enum: [ SA, CT, VAT, EPAYE ]
+                  example: SA
 
                 reference:
                   description: The reference identifying the tax liability.
                   type: string
-                  example: "1097172564"
+                  example: 1097172564
 
                 amount:
                   description: The amount to be paid in pennies, so £12.34 is 1234, must be greater than 0.
@@ -144,7 +149,9 @@ paths:
       responses:
         201:
           description: |
-            Created. A 201 response tells the API user that the journey has been created and the customer
+            Created.
+            
+            A 201 response tells the API user that the journey has been created and the customer
             can be safely redirected to the redirect-url that is embedded in the returned JSON.
           content:
             application/json:
@@ -155,10 +162,15 @@ paths:
                     type: string
                     description: The url to direct the customer browser to, to initiate the customer payment journey
               example:
-                {"redirect-url": "https://tax.gov.uk/third-party-payment/jhdugiuygdwuygsxajvbh"}
+                {"redirect-url": "https://tax.gov.uk/payments/start/jhdugiuygdwuygsxajvbh"}
 
         400:
-          description: "Bad Request TBS Rocco"
+          description: |
+            Bad Request
+          
+            A 400 hundred response represents a malformed request. The returned JSON will attempt to guide
+            the API user to the problem.
+
           content:
             application/json:
               schema:
@@ -166,37 +178,50 @@ paths:
                 properties:
                   error:
                     type: string
-                    description: The url to direct the customer browser to, to initiate the customer payment journey
+                    description: The error field contains the error message.
               example:
-                {
-                  "error": "Mandatory reference field was omitted."
-                }
+                {"error": "Mandatory reference field was omitted."}
   /status:
     get:
-      description: Find the status of a payment TBS Rocco
+      description: |
+        Discover the status of a payment. 
+        
+        The API user can discover the status of a payment when they provide the tax-regime, reference, and vendor journey id
+        that was provided when the payment journey was first created. The JSON returned will repeat these three fields and add
+        the amount that the customer actually paid. *Note* that the amount can be zero in the return denoting that no money
+        was transferred to HMRC because the journey has not completed with money transferred to HMRC. This can arise from
+        a number of situations but HMRC will not provide any further information.
+
       parameters:
         - in: query
-          name: ss
+          name: tr
           schema:
             type: string
-          description: Search scope. One of a fixed set TBS.
+            description: The tax regime. One of a fixed set.
+            example: SA
+            enum: [ SA, CT, VAT, EPAYE ]
 
         - in: query
-          name: st
+          name: ref
           schema:
             type: string
-          description: The thing being searched for - typically the reference
+            description: The reference as originally provided by HMRC.
+            example: 1097172564
 
         - in: query
-          name: jid
+          name: vjid
           schema:
             type: string
             format: uuid
-          description: The journey identifier supplied by Vendor when the payment was set up
+            description: The journey identifier supplied by API user when the payment was set up.
+            example: a218f71d-9bf2-438e-851c-71d50866c2e9
 
       responses:
         200:
-          description: "Ok TBS Rocco"
+          description: |
+            Ok
+            
+            A payment matching the query was found and the details returned in the JSON response
           content:
             application/json:
               schema:
@@ -206,32 +231,40 @@ paths:
                     # Note that this is not the final set of regimes
                     type: string
                     description: The tax regime under which the liability has arisen. One of a fixed set.
-                    enum: [ SA, CT, VAT ]
+                    enum: [ SA, CT, VAT, EPAYE ]
 
                   reference:
                     type: string
                     description: The reference identifying the tax liability.
+                    example: 1097172564
 
                   amount:
                     description: Represents the amount actually paid. It may be zero.
                     type: integer
                     minimum: 0
                     exclusiveMinimum: false
+                    example: 3456
 
-                  jid:
+                  vendor-journey-id:
                     description: The vendor journey Id. Repeated back.
                     type: string
                     format: uuid
+                    example: a218f71d-9bf2-438e-851c-71d50866c2e9
 
               example:
                 {
                   "tax-regime": "SA",
                   "reference": "1097172564",
                   "amount": 1453,
-                  "jid": a218f71d-9bf2-438e-851c-71d50866c2e9
+                  "vendor-journey-id": a218f71d-9bf2-438e-851c-71d50866c2e9
                 }
         401:
-          description: "Bad Request TBS Rocco"
+          description: |
+            Bad Request
+            
+            A 400 hundred response represents a malformed request. The returned JSON will attempt to guide
+            the API user to the problem.
+
           content:
             application/json:
               schema:
@@ -242,10 +275,15 @@ paths:
                     description: The url to direct the customer browser to, to initiate the customer payment journey
               example:
                 {
-                  "error": "Mandatory ss query was ommited."
+                  "error": "Mandatory ref field of query was omitted."
                 }
         403:
-          description: "Not found TBS Rocco"
+          description: |
+            Not found
+            
+            This response is returned when the query was not malformed but no matching payment could be identified.
+            Either the payment journey never existed, or HMRC no longer has a record of the journey.
+            
 
 
 
