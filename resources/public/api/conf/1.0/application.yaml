@@ -12,16 +12,17 @@ info:
     end of the journey the user will be told to return to the originating software. If an optional back-url was provide
     by the API user we will offer this as a link to the customer to continue their journey.
     
-    When the fire and forget workflow is chosen, additional details regarding the outcome of the payment can be 
-    discovered by the api user by taking advantage of the /status endpoint.
+    When the *Fire and Forget* workflow is chosen, additional details about the outcome of the payment can be discovered 
+    by the API user by taking advantage of the /status endpoint.
     
-    A *Roundtrip* workflow can be implemented by including an additional return-url. If this is present HMRC will
-    post JSON representing the payment outcome to this endpoint [NB. Security?] that gives details about the payment including the amount
-    the customer actually paid. Note that this amount may be zero.
+    A *Round Trip* workflow can be implemented by including an additional return-url field. If present, HMRC will post 
+    JSON representing the payment outcome to this endpoint [NB. Security?]. This provides details about the payment, 
+    including the amount the customer paid (this may be zero). 
     
-    The /status endpoint can be used with roundtrip workflows as well. Note that journey details are not permanently
-    stored at HMRC as they contain sensitive information. If the status for a journey can't be found (response 403)
-    it indicates either that a journey with the submitted details was not made, or that the record has been deleted. 
+    The /status endpoint can also be used with round trip workflows. Journey details are not permanently stored at HMRC 
+    as they contain sensitive information. If the status for a journey cannot be found (response 403) this means that a 
+    journey with the submitted details was not made, or that the record has been deleted. 
+
     Typical lifetimes for journey storage are not yet determined.
 
 
@@ -69,41 +70,41 @@ paths:
       description: |
         Begin a payment journey.
         
-        On a successful call to the /pay endpoint to start the payment process the
-        API user will receive JSON containing a redirection URL in return. They will then 
-        redirect their customer's browser to that URL. This starts the journey for the customer.
+        After a successful call to the /pay endpoint, the API user receives JSON with a redirection URL. The API user 
+        then redirects the customer's browser to this URL, starting the payment journey.
+
       requestBody:
         description: |
-          The request body *always* contains the fields that allow HMRC to be able to identify
-          the liability that is being paid so that the funds are not mis-allocated. The necessary
-          fields are the tax-regime, the reference, the amount, and a journey identifier called
-          the vendor-journey-id.
+          The request body always contains the fields that allow HMRC to identify the liability that is being paid, so 
+          that the funds are not mis-allocated. The necessary fields are the tax-regime, the reference, the amount, and 
+          a journey identifier called the vendor-journey-ID.
           
-          The tax-regime field identifies the tax being paid, currently Self Assessment (SA),
-          Corporation Tax (CT), VAT, and EPAYE are supported.
+          The tax-regime field identifies the tax being paid, Self Assessment (SA), Corporation Tax (CT), VAT, and 
+          EPAYE are supported.
           
           The reference is the reference supplied by HMRC when the liability arose.
           
           The amount is an integer number of pennies that must be greater than 0.
           
-          The vendor-journey-id is a UUID (version 4, varient 2) that is supplied by the API user
-          in order to identify the journey in calls to the /status endpoint.
+          The vendor-journey-id field is a UUID (version 4, variant 2) that is supplied by the API user in order to identify 
+          the journey in calls to the /status endpoint.
           
           The API user can optionally supply two additional URLs.
           
-          If the return-url is supplied, HMRC will post details of the customer's journey 
+          If the return-URL is supplied, HMRC will post details of the customer's journey 
           in JSON format to that URL once the customer journey is complete.
           
-          If the back-url is supplied, this url will be diplayed as a link to the customer
+          If the back-url field is supplied, this URL will be displayed as a link to the customer
           at the end of the customer's journey to conveniently return to the API user's 
           systems.
+
 
         required: true
         content:
           application/json:
             schema:
               title: Pay request schema
-              description: The Json describing an HMRC third party payment /pay payload.
+              description: The JSON describing an HMRC third party payment /pay payload.
               type: object
               required: [ tax-regime, reference, amount, vendor-journey-id ]
               properties:
@@ -160,7 +161,7 @@ paths:
                 properties:
                   redirect-url:
                     type: string
-                    description: The url to direct the customer browser to, to initiate the customer payment journey
+                    description: The URL to direct the customer browser to initiate the customer payment journey
               example:
                 {"redirect-url": "https://tax.gov.uk/payments/start/jhdugiuygdwuygsxajvbh"}
 
@@ -168,7 +169,7 @@ paths:
           description: |
             Bad Request
           
-            A 400 hundred response represents a malformed request. The returned JSON will attempt to guide
+            A 400 response represents a malformed request. The returned JSON will attempt to guide
             the API user to the problem.
 
           content:
@@ -186,10 +187,10 @@ paths:
       description: |
         Discover the status of a payment. 
         
-        The API user can discover the status of a payment when they provide the tax-regime, reference, and vendor journey id
-        that was provided when the payment journey was first created. The JSON returned will repeat these three fields and add
+        The API user can check the payment status by providing the tax-regime, reference, and vendor journey ID used 
+        when the payment journey was created. The JSON returned will repeat these three fields and add
         the amount that the customer actually paid. *Note* that the amount can be zero in the return denoting that no money
-        was transferred to HMRC because the journey has not completed with money transferred to HMRC. This can arise from
+        was transferred to HMRC because the journey has not completed in a standard way. This can arise from
         a number of situations but HMRC will not provide any further information.
 
       parameters:
