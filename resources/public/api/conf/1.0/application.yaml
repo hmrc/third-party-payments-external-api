@@ -16,7 +16,7 @@ info:
     discovered by the api user by taking advantage of the /status endpoint.
     
     A *Roundtrip* workflow can be implemented by including an additional return-url. If this is present HMRC will
-    post JSON of the payment to this endpoint [NB. Security?] that gives details about the payment including the amount
+    post JSON representing the payment outcome to this endpoint [NB. Security?] that gives details about the payment including the amount
     the customer actually paid. Note that this amount may be zero.
     
     The /status endpoint can be used with roundtrip workflows as well. Note that journey details are not permanently
