@@ -2,9 +2,9 @@
   "scopes": [
   ],
   "api": {
-    "name": "Hello World",
-    "description": "A 'hello world' example of an API on the HMRC API Developer Hub.",
-    "context": "discuss-with-the-api-platform-team",
+    "name": "HMRC third party payments",
+    "description": "This API accepts payments from outside of HMRC",
+    "context": "/payments/make-payment",
     "categories": ["OTHER"],
     "versions": [
       {
