@@ -4,24 +4,14 @@ info:
   version: 1.0.0
   title: HMRC third party payments
   description: |
-    This API accepts payments from outside of HMRC. There are two workflows possible,
-      1. Fire and forget.
-      2. Roundtrip.
+    This API accepts payments from outside of HMRC. 
     
-    The *Fire and Forget* workflow enables an API user to redirect a customer through to an HMRC payment journey. At the
-    end of the journey the user will be told to return to the originating software. If an optional back-url was provide
+    The workflow enables an API user to redirect a customer through to an HMRC payment journey. 
+    If an optional back-url was provided
     by the API user we will offer this as a link to the customer to continue their journey.
     
-    When the *Fire and Forget* workflow is chosen, additional details about the outcome of the payment can be discovered 
+    Additional details about the outcome of the payment can be discovered 
     by the API user by taking advantage of the /status endpoint.
-    
-    A *Round Trip* workflow can be implemented by including an additional return-url field. If present, HMRC will post 
-    JSON representing the payment outcome to this endpoint [NB. Security?]. This provides details about the payment, 
-    including the amount the customer paid (this may be zero). 
-    
-    The /status endpoint can also be used with round trip workflows. Journey details are not permanently stored at HMRC 
-    as they contain sensitive information. If the status for a journey cannot be found (response 403) this means that a 
-    journey with the submitted details was not made, or that the record has been deleted. 
 
     Typical lifetimes for journey storage are not yet determined.
 
@@ -80,7 +70,7 @@ paths:
           a journey identifier called the vendorJourneyId.
           
           The taxRegime field identifies the tax being paid, Self Assessment (SA), Corporation Tax (CT), VAT, and 
-          EPAYE are supported.
+          employers' PAYE (EPAYE) are supported.
           
           The reference is the reference supplied by HMRC when the liability arose.
           
@@ -90,9 +80,6 @@ paths:
           the journey in calls to the /status endpoint.
           
           The API user can optionally supply two additional URLs.
-          
-          If the returnURL is supplied, HMRC will post details of the customer's journey 
-          in JSON format to that URL once the customer journey is complete.
           
           If the backURL field is supplied, this URL will be displayed as a link to the customer
           at the end of the customer's journey to conveniently return to the API user's 
@@ -131,14 +118,6 @@ paths:
                   type: string
                   format: uuid
                   example: a218f71d-9bf2-438e-851c-71d50866c2e9
-
-                returnURL:
-                  # It would be helpful to be able to describe the schema for the JSON that we would post to this endpoint
-                  description: If this is present HMRC will POST JSON back to the API user giving the outcome of the  journey.
-                  type: string
-                  format: uri
-                  example: "https://some-accounting-software.com/payment-complete/a218f71d9bf2438e851c71d50866c2e9"
-
 
                 backURL:
                   description: If this is present HMRC will offer this as a link to the  Customer at the end of the journey.
@@ -190,7 +169,7 @@ paths:
         The API user can check the payment status by providing the tax-regime, reference, and vendor journey ID used 
         when the payment journey was created. The JSON returned will repeat these three fields and add
         the amount that the customer actually paid. *Note* that the amount can be zero in the return denoting that no money
-        was transferred to HMRC because the journey has not completed in a standard way. This can arise from
+        was sent to HMRC because the journey has not completed in a standard way. This can arise from
         a number of situations but HMRC will not provide any further information.
 
       parameters:
@@ -263,7 +242,7 @@ paths:
           description: |
             Bad Request
             
-            A 400 hundred response represents a malformed request. The returned JSON will attempt to guide
+            A 401 response represents a malformed request. The returned JSON will attempt to guide
             the API user to the problem.
 
           content:
