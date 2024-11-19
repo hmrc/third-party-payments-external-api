@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
+package uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata
 
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
 
-//TODO: Jake delete
-@Singleton()
-class MicroserviceHelloWorldController @Inject() (cc: ControllerComponents)
-  extends BackendController(cc) {
+object PayApiTestData {
 
-  def hello(): Action[AnyContent] = Action.async { _ =>
-    Future.successful(Ok("Hello world"))
-  }
+  val spjResponse: SpjResponse = SpjResponse("some-journey-id", "https://somenext-url.co.uk")
+
 }

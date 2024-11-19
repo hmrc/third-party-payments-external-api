@@ -17,6 +17,7 @@ lazy val microservice = Project("third-party-payments-external-api", file("."))
       if (StrictBuilding.strictBuilding.value) ScalaCompilerFlags.strictScalaCompilerOptions else Nil
     }
   )
+  .settings(PlayKeys.playDefaultPort := 10155) //TODO: Jake, need different port, just stole this to test locally.
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(commands ++= SbtCommands.commands)
   .settings(CodeCoverageSettings.settings *)
