@@ -39,8 +39,6 @@ trait ItSpec extends AnyFreeSpecLike
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit lazy val materializer: Materializer = app.materializer
 
-  //  private val testServerPort: Int = 19001
-
   protected lazy val configMap: Map[String, Any] = Map[String, Any](
     "auditing.enabled" -> false,
     "auditing.traceRequests" -> false,
@@ -49,14 +47,4 @@ trait ItSpec extends AnyFreeSpecLike
 
   override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure(configMap).build()
-  //
-  //  override implicit protected lazy val runningServer: RunningServer =
-  //    TestServerFactory.start(app)
-
-  //  object TestServerFactory extends DefaultTestServerFactory {
-  //    override protected def serverConfig(app: Application): ServerConfig = {
-  //      val sc: ServerConfig = ServerConfig(port    = Some(testServerPort), sslPort = Some(0), mode = Mode.Test, rootDir = app.path)
-  //      sc.copy(configuration = sc.configuration.withFallback(overrideServerConfiguration(app)))
-  //    }
-  //  }
 }
