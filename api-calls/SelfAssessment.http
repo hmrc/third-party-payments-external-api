@@ -1,11 +1,10 @@
 
 ### Spj3psSa
 
-POST http://localhost:10155/pay
+POST http://localhost:10156/pay
 Accept: */*
 Cache-Control: no-cache
 Content-Type: Application/Json
-#x-session-id: 	session-72d7cb55-dcfa-4882-a229-9c44b90cbd83
 
 {
   "taxRegime": "SelfAssessment",
