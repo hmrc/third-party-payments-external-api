@@ -26,6 +26,7 @@ lazy val microservice = Project("third-party-payments-external-api", file("."))
   .settings(WartRemoverSettings.wartRemoverSettings: _*)
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
+    Compile / scalacOptions -= "utf8"
   )
 
 lazy val it = project
