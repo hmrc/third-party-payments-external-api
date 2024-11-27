@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
+package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty
 
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import play.api.libs.json.{Json, OFormat}
 
-//TODO: Jake delete
-@Singleton()
-class MicroserviceHelloWorldController @Inject() (cc: ControllerComponents)
-  extends BackendController(cc) {
+final case class ThirdPartyPayResponse(redirectURL: String) extends AnyVal
 
-  def hello(): Action[AnyContent] = Action.async { _ =>
-    Future.successful(Ok("Hello world"))
+object ThirdPartyPayResponse {
+  implicit val format: OFormat[ThirdPartyPayResponse] = Json.format[ThirdPartyPayResponse]
+}
+
+sealed trait ThirdPartyResponseError {
+  val errorMessage: String
+}
+
+object ThirdPartyResponseErrors {
+  case object UpstreamError extends ThirdPartyResponseError {
+    val errorMessage = "Error from upstream"
   }
 }

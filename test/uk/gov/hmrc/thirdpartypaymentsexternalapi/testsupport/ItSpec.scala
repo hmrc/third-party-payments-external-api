@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.thirdpartypaymentsexternalapi
+package uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport
 
 import org.apache.pekko.stream.Materializer
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import play.api.{Application, Mode}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.{DefaultTestServerFactory, RunningServer}
-import play.core.server.ServerConfig
 import uk.gov.hmrc.http.test.WireMockSupport
 
 import scala.concurrent.ExecutionContext
@@ -47,4 +45,5 @@ trait ItSpec extends AnyFreeSpecLike
 
   override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure(configMap).build()
+
 }

@@ -1,3 +1,5 @@
 # microservice specific routes
 
 GET        /hello-world             uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers.MicroserviceHelloWorldController.hello
+
+POST       /pay                     uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers.StartPaymentController.pay()

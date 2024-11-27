@@ -1,0 +1,15 @@
+
+### Spj3psSa
+
+POST http://localhost:10156/pay
+Accept: */*
+Cache-Control: no-cache
+Content-Type: Application/Json
+
+{
+  "taxRegime": "SelfAssessment",
+  "reference": "1234567895",
+  "amountInPence": 123,
+  "vendorJourneyId": "some-vendor-id",
+  "backURL": "https://www.someBackUrl.com"
+}

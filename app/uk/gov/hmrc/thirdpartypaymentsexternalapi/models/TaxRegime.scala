@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
+package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import enumeratum.{PlayJsonEnum, Enum, EnumEntry}
 
-//TODO: Jake delete
-@Singleton()
-class MicroserviceHelloWorldController @Inject() (cc: ControllerComponents)
-  extends BackendController(cc) {
+sealed trait TaxRegime extends EnumEntry
 
-  def hello(): Action[AnyContent] = Action.async { _ =>
-    Future.successful(Ok("Hello world"))
-  }
+object TaxRegime extends Enum[TaxRegime] with PlayJsonEnum[TaxRegime] {
+
+  val values: IndexedSeq[TaxRegime] = findValues
+
+  case object SelfAssessment extends TaxRegime
+  case object Vat extends TaxRegime
+  case object CorporationTax extends TaxRegime
+  case object EmployersPayAsYouEarn extends TaxRegime
+
 }
