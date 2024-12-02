@@ -86,8 +86,7 @@ paths:
           that the funds are not mis-allocated. The required fields are the taxRegime, the reference, the amountInPence, and 
           a journey identifier called the clientJourneyId.
           
-          The taxRegime field identifies the tax being paid, Self Assessment, Corporation Tax, VAT, and 
-          Employers' Pay As You Earn are supported.
+          The taxRegime field identifies the tax being paid. Currently supported regimes are: Self Assessment.
           
           The reference is the reference supplied by HMRC when the liability arose.
           
@@ -117,7 +116,7 @@ paths:
                 taxRegime:
                   type: string
                   description: The tax regime under which the liability has arisen. One of a fixed set.
-                  enum: [ SelfAssessment, Vat, CorporationTax, EmployersPayAsYouEarn ]
+                  enum: [ SelfAssessment ]
                   example: SelfAssessment
                 paymentReference:
                   description: The reference identifying the tax liability, such as a UTR or VRN.
@@ -220,7 +219,7 @@ paths:
                   taxRegime:
                     type: string
                     description: The tax regime under which the liability has arisen. One of a fixed set.
-                    enum: [ SelfAssessment, Vat, CorporationTax, EmployersPayAsYouEarn ]
+                    enum: [ SelfAssessment ]
                     example: "SelfAssessment"
 
                   paymentReference:
