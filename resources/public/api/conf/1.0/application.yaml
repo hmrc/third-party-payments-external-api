@@ -83,17 +83,20 @@ paths:
       requestBody:
         description: |
           The request body always contains the fields that allow HMRC to identify the liability that is being paid, so 
-          that the funds are not mis-allocated. The required fields are the taxRegime, the reference, the amountInPence, and 
+          that the funds are not mis-allocated. The required fields are the taxRegime, the paymentReference, the amountInPence, dueDate and 
           a journey identifier called the clientJourneyId.
           
           The taxRegime field identifies the tax being paid. Currently supported regimes are: Self Assessment.
           
-          The reference is the reference supplied by HMRC when the liability arose.
+          The paymentReference is the reference supplied by HMRC when the liability arose.
           
-          The amountInPence is an integer number of pennies that must be greater than 0.
+          The amountInPence is an integer number of pennies that must be greater than 0.  
           
           The clientJourneyId field is a UUID (version 4, variant 2) that is supplied by the API user in order to identify 
           the journey in calls to the /status endpoint.
+          
+          The API user can optionally supply a due date for the liability. This enables the user to setup a scheduled, future dated payment.
+          This date must be in the future in format YYYY-MM-DD and cannot be today's date.
           
           The API user can optionally supply an additional URL.
           
@@ -119,7 +122,7 @@ paths:
                   enum: [ SelfAssessment ]
                   example: SelfAssessment
                 paymentReference:
-                  description: The reference identifying the tax liability, such as a UTR or VRN.
+                  description: The reference identifying the tax liability, penalty or interest payment. For self assessment this is the SA UTR and is 10 digits long.
                   type: string
                   example: 1097172564
                 amountInPence:
@@ -129,6 +132,11 @@ paths:
                   exclusiveMinimum: true
                   "multipleOf": 1
                   example: 1234
+                dueDate:
+                  description: The due date of the liability in format YYYY-MM-DD, an optional date in the future, not today.
+                  type: string
+                  format: date
+                  example: 2024-12-30
                 backURL:
                   description: If this is present HMRC will offer this as a link to the customer at the end of the journey.
                   type: string
@@ -237,14 +245,11 @@ paths:
                     type: string
                     enum: [ Completed, Failed, Cancelled, Scheduled ]
                     example: "Completed"
-
-
-
               example:
                 {
                   "clientJourneyId": "a218f71d-9bf2-438e-851c-71d50866c2e9",
                   "taxRegime": "SelfAssessment",
-                  "reference": "1097172564",
+                  "paymentReference": "1097172564",
                   "amountInPence": 1453,
                   "paymentStatus": "Completed"
                 }
