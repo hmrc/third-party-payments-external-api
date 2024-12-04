@@ -4,7 +4,7 @@
   "api": {
     "name": "HMRC third party payments",
     "description": "This API accepts payments from outside of HMRC",
-    "context": "/payments/make-payment",
+    "context": "payments/make-payment",
     "categories": ["OTHER"],
     "versions": [
       {
