@@ -1,6 +1,4 @@
 {
-  "scopes": [
-  ],
   "api": {
     "name": "HMRC third party payments",
     "description": "This API accepts payments from outside of HMRC",
