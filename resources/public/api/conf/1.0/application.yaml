@@ -4,27 +4,15 @@ info:
   version: 1.0.0
   title: HMRC third party payments
   description: |
-    This API accepts payments from outside of HMRC. There are two workflows possible,
-      1. Fire and forget.
-      2. Roundtrip.
+    This API allows users to trigger an HMRC payment journey from their software. 
     
-    The *Fire and Forget* workflow enables an API user to redirect a customer through to an HMRC payment journey. At the
-    end of the journey the user will be told to return to the originating software. If an optional back-url was provide
-    by the API user we will offer this as a link to the customer to continue their journey.
+    The workflow enables an API user to redirect a customer through to an HMRC payment journey. 
+    If an optional back-url was provided by the API user we will offer this as a link to the customer to continue their journey.
     
-    When the *Fire and Forget* workflow is chosen, additional details about the outcome of the payment can be discovered 
+    Additional details about the outcome of the payment can be discovered 
     by the API user by taking advantage of the /status endpoint.
-    
-    A *Round Trip* workflow can be implemented by including an additional return-url field. If present, HMRC will post 
-    JSON representing the payment outcome to this endpoint [NB. Security?]. This provides details about the payment, 
-    including the amount the customer paid (this may be zero). 
-    
-    The /status endpoint can also be used with round trip workflows. Journey details are not permanently stored at HMRC 
-    as they contain sensitive information. If the status for a journey cannot be found (response 403) this means that a 
-    journey with the submitted details was not made, or that the record has been deleted. 
 
     Typical lifetimes for journey storage are not yet determined.
-
 
 servers:
   - url: https://test-api.service.hmrc.gov.uk/payments/make-payment
@@ -61,43 +49,58 @@ components:
       in: header
       schema:
         type: string
-        enum: ["application/vnd.hmrc.1.0+json"]
+        enum: [ "application/vnd.hmrc.1.0+json" ]
+      required: true
+    contentTypeJsonHeader:
+      name: "Content-Type"
+      in: header
+      description: |
+        Specifies the format of the request body, which must be JSON.
+      schema:
+        type: string
+        enum:
+          - "application/json"
+      required: true
+    authorizationHeader:
+      name: "Authorization"
+      in: header
+      description: |
+        An OAuth 2.0 Bearer Token.
+      schema:
+        type: string
+        example: Bearer bb7fed3fe10dd235a2ccda3d50fb
       required: true
 
 paths:
   /pay:
     post:
+      summary: Begin a payment journey.
       description: |
-        Begin a payment journey.
-        
-        After a successful call to the /pay endpoint, the API user receives JSON with a redirection URL. The API user 
+        After a successful call to the /pay endpoint, the API user receives JSON with a redirection URL. The API user
         then redirects the customer's browser to this URL, starting the payment journey.
-
+      security:
+        - applicationRestricted: [ ]
       requestBody:
         description: |
           The request body always contains the fields that allow HMRC to identify the liability that is being paid, so 
-          that the funds are not mis-allocated. The necessary fields are the taxRegime, the reference, the amountInPence, and 
-          a journey identifier called the vendorJourneyId.
+          that the funds are not mis-allocated. The required fields are the taxRegime, the paymentReference, the amountInPence, dueDate and 
+          a journey identifier called the clientJourneyId.
           
-          The taxRegime field identifies the tax being paid, Self Assessment (SA), Corporation Tax (CT), VAT, and 
-          EPAYE are supported.
+          The taxRegime field identifies the tax being paid. Currently supported regimes are: Self Assessment.
           
-          The reference is the reference supplied by HMRC when the liability arose.
+          The paymentReference is the reference supplied by HMRC when the liability arose.
           
-          The amountInPence is an integer number of pennies that must be greater than 0.
+          The amountInPence is an integer number of pennies that must be greater than 0.  
           
-          The vendorJourneyId field is a UUID (version 4, variant 2) that is supplied by the API user in order to identify 
+          The clientJourneyId field is a UUID (version 4, variant 2) that is supplied by the API user in order to identify 
           the journey in calls to the /status endpoint.
           
-          The API user can optionally supply two additional URLs.
+          The API user can optionally supply a due date for the liability. This enables the user to setup a scheduled, future dated payment.
+          This date must be in the future in format YYYY-MM-DD and cannot be today's date.
           
-          If the returnURL is supplied, HMRC will post details of the customer's journey 
-          in JSON format to that URL once the customer journey is complete.
+          The API user can optionally supply an additional URL.
           
-          If the backURL field is supplied, this URL will be displayed as a link to the customer
-          at the end of the customer's journey to conveniently return to the API user's 
-          systems.
-
+          A backURL enables HMRC to display a link to the user to allow them to return to their software.
 
         required: true
         content:
@@ -106,54 +109,43 @@ paths:
               title: Pay request schema
               description: The JSON describing an HMRC third party payment /pay payload.
               type: object
-              required: [ taxRegime, reference, amountInPence, vendorJourneyId ]
+              required: [ clientJourneyId, taxRegime, paymentReference, amountInPence ]
               properties:
-                taxRegime:
-                  #We need to sort out the acceptable regimes, e.g. which regime will SA actually go through?
-                  type: string
-                  description: The tax regime under which the liability has arisen. One of a fixed set.
-                  enum: [ SA, CT, VAT, EPAYE ]
-                  example: SA
-
-                reference:
-                  description: The reference identifying the tax liability.
-                  type: string
-                  example: 1097172564
-
-                amountInPence:
-                  description: The amount to be paid in pennies, so £12.34 is 1234, must be greater than 0.
-                  type: long
-                  minimum: 0
-                  exclusiveMinimum: true
-
-                vendorJourneyId:
-                  description: Your identifier for this journey. Must be a UUID (version 4, variant 2).
+                clientJourneyId:
+                  description: The client identifier for this journey. Must be a UUID (version 4, variant 2).
                   type: string
                   format: uuid
                   example: a218f71d-9bf2-438e-851c-71d50866c2e9
-
-                returnURL:
-                  # It would be helpful to be able to describe the schema for the JSON that we would post to this endpoint
-                  description: If this is present HMRC will POST JSON back to the API user giving the outcome of the  journey.
+                taxRegime:
                   type: string
-                  format: uri
-                  example: "https://some-accounting-software.com/payment-complete/a218f71d9bf2438e851c71d50866c2e9"
-
-
+                  description: The tax regime under which the liability has arisen. One of a fixed set.
+                  enum: [ SelfAssessment ]
+                  example: SelfAssessment
+                paymentReference:
+                  description: The reference identifying the tax liability, penalty or interest payment. For self assessment this is the SA UTR and is 10 digits long.
+                  type: string
+                  example: 1097172564
+                amountInPence:
+                  description: The amount to be paid in pennies, so £12.34 is 1234, must be greater than 0.
+                  type: number
+                  minimum: 0
+                  exclusiveMinimum: true
+                  "multipleOf": 1
+                  example: 1234
+                dueDate:
+                  description: The due date of the liability in format YYYY-MM-DD, an optional date in the future, not today.
+                  type: string
+                  format: date
+                  example: 2024-12-30
                 backURL:
-                  description: If this is present HMRC will offer this as a link to the  Customer at the end of the journey.
+                  description: If this is present HMRC will offer this as a link to the customer at the end of the journey.
                   type: string
                   format: uri
                   example: "https://some-accounting-software.com/after-pay/a218f71d9bf2438e851c71d50866c2e9"
 
-
       responses:
         201:
-          description: |
-            Created.
-            
-            A 201 response tells the API user that the journey has been created and the customer
-            can be safely redirected to the redirect-url that is embedded in the returned JSON.
+          description: Created. Body contains url to redirect user to.
           content:
             application/json:
               schema:
@@ -161,17 +153,16 @@ paths:
                 properties:
                   redirectURL:
                     type: string
-                    description: The URL to direct the customer browser to initiate the customer payment journey
+                    description: The URL to direct the customer browser to in order to initiate the customer payment journey
               example:
-                {"redirectURL": "https://tax.gov.uk/payments/start/jhdugiuygdwuygsxajvbh"}
+                { "redirectURL": "https://tax.gov.uk/payments/start/jhdugiuygdwuygsxajvbh" }
 
         400:
           description: |
-            Bad Request
-          
+            Bad Request.
+            
             A 400 response represents a malformed request. The returned JSON will attempt to guide
             the API user to the problem.
-
           content:
             application/json:
               schema:
@@ -181,89 +172,90 @@ paths:
                     type: string
                     description: The error field contains the error message.
               example:
-                {"error": "Mandatory reference field was omitted."}
-  /status:
-    get:
-      description: |
-        Discover the status of a payment. 
-        
-        The API user can check the payment status by providing the tax-regime, reference, and vendor journey ID used 
-        when the payment journey was created. The JSON returned will repeat these three fields and add
-        the amount that the customer actually paid. *Note* that the amount can be zero in the return denoting that no money
-        was transferred to HMRC because the journey has not completed in a standard way. This can arise from
-        a number of situations but HMRC will not provide any further information.
+                { "error": "Mandatory paymentReference field was omitted." }
 
-      parameters:
-        - in: query
-          name: tr
-          schema:
-            type: string
-            description: The tax regime. One of a fixed set.
-            example: SA
-            enum: [ SA, CT, VAT, EPAYE ]
-
-        - in: query
-          name: ref
-          schema:
-            type: string
-            description: The reference as originally provided by HMRC.
-            example: 1097172564
-
-        - in: query
-          name: vjid
-          schema:
-            type: string
-            format: uuid
-            description: The journey identifier supplied by API user when the payment was set up.
-            example: a218f71d-9bf2-438e-851c-71d50866c2e9
-
-      responses:
-        200:
-          description: |
-            Ok
-            
-            A payment matching the query was found and the details returned in the JSON response
+        500:
+          description: An error occurred upstream and could not be recovered from.
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  error:
+                    type: string
+                    description: The error field contains the error message.
+              example:
+                { "error": "Error from upstream" }
+
+  /status:
+    get:
+      summary: Discover the status of a payment.
+      description: |
+        The API user can check the payment status by providing the clientJourneyId used 
+        when the payment journey was created.
+        The JSON body returned will include the clientJourneyId, the taxRegime, the paymentReference, the amountInPence paid and also the paymentStatus. 
+        *NOTE* the paymentStatus is a fixed enum, with scheduled meaning the payment has not been taken, but has been scheduled to be taken at a future date chosen by the user.
+
+      security:
+        - applicationRestricted: [ ]
+
+      parameters:
+
+        - in: query
+          name: clientJourneyId
+          required: true
+          description: The client's identifier for the journey.
+          schema:
+            type: string
+            example: "a218f71d-9bf2-438e-851c-71d50866c2e9"
+
+      responses:
+        200:
+          description: |
+            A payment matching the query was found and the details returned in the JSON response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ clientJourneyId, taxRegime, paymentReference, amountInPence, paymentStatus ]
+                properties:
+                  clientJourneyId:
+                    type: string
+                    description: The client's identifier for the journey/payment.
+                    example: "a218f71d-9bf2-438e-851c-71d50866c2e9"
+
                   taxRegime:
-                    # Note that this is not the final set of regimes
                     type: string
                     description: The tax regime under which the liability has arisen. One of a fixed set.
-                    enum: [ SA, CT, VAT, EPAYE ]
+                    enum: [ SelfAssessment ]
+                    example: "SelfAssessment"
 
-                  reference:
+                  paymentReference:
                     type: string
                     description: The reference identifying the tax liability.
-                    example: 1097172564
+                    example: "1097172564"
 
                   amountInPence:
-                    description: Represents the amount actually paid. It may be zero.
+                    description: Represents the amount actually paid, in pence.
                     type: integer
-                    minimum: 0
-                    exclusiveMinimum: false
                     example: 3456
 
-                  vendorJourneyId:
-                    description: The vendor journey Id. Repeated back.
+                  paymentStatus:
+                    description: The status of the payment within the HMRC system.
                     type: string
-                    format: uuid
-                    example: a218f71d-9bf2-438e-851c-71d50866c2e9
-
+                    enum: [ Completed, Failed, Cancelled, Scheduled ]
+                    example: "Completed"
               example:
                 {
-                  "taxRegime": "SA",
-                  "reference": "1097172564",
+                  "clientJourneyId": "a218f71d-9bf2-438e-851c-71d50866c2e9",
+                  "taxRegime": "SelfAssessment",
+                  "paymentReference": "1097172564",
                   "amountInPence": 1453,
-                  "vendorJourneyId": a218f71d-9bf2-438e-851c-71d50866c2e9
+                  "paymentStatus": "Completed"
                 }
-        401:
+        400:
           description: |
-            Bad Request
-            
-            A 400 hundred response represents a malformed request. The returned JSON will attempt to guide
+            A malformed request. The returned JSON will attempt to guide
             the API user to the problem.
 
           content:
@@ -273,18 +265,10 @@ paths:
                 properties:
                   error:
                     type: string
-                    description: The url to direct the customer browser to, to initiate the customer payment journey
+                    description: |
+                      An error containing what may be wrong with the request.
               example:
-                {
-                  "error": "Mandatory ref field of query was omitted."
-                }
-        403:
+                { "error": "Mandatory clientJourneyId field of query was omitted." }
+        404:
           description: |
-            Not found
-            
-            This response is returned when the query was not malformed but no matching payment could be identified.
             Either the payment journey never existed, or HMRC no longer has a record of the journey.
-            
-
-
-
