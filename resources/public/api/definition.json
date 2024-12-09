@@ -1,7 +1,7 @@
 {
   "api": {
-    "name": "HMRC third party payments",
-    "description": "This API accepts payments from outside of HMRC",
+    "name": "Initiate payment",
+    "description": "This API allows users to trigger an HMRC payment journey from their software.",
     "context": "payments/make-payment",
     "categories": ["OTHER"],
     "versions": [
