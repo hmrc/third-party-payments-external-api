@@ -2,7 +2,7 @@ openapi: "3.0.3"
 
 info:
   version: 1.0.0
-  title: HMRC third party payments
+  title: Initiate payment
   description: |
     This API allows users to trigger an HMRC payment journey from their software. 
     
@@ -90,7 +90,7 @@ paths:
           
           The paymentReference is the reference supplied by HMRC when the liability arose.
           
-          The amountInPence is an integer number of pennies that must be greater than 0.  
+          The amountInPence is an integer number of pennies that must be greater than or equal to 0. If 0 is provided, the user will be prompted to enter an amount. If non zero is provided, user will be prompted to select the amount or enter another amount.
           
           The clientJourneyId field is a UUID (version 4, variant 2) that is supplied by the API user in order to identify 
           the journey in calls to the /status endpoint.
@@ -126,17 +126,16 @@ paths:
                   type: string
                   example: 1097172564
                 amountInPence:
-                  description: The amount to be paid in pennies, so £12.34 is 1234, must be greater than 0.
-                  type: number
+                  description: The amount to be paid in pennies, so £12.34 is 1234, must be greater than or equal to 0.
+                  type: integer
                   minimum: 0
-                  exclusiveMinimum: true
-                  "multipleOf": 1
+                  exclusiveMinimum: false
                   example: 1234
                 dueDate:
-                  description: The due date of the liability in format YYYY-MM-DD, an optional date in the future, not today.
+                  description: The due date of the liability in format YYYY-MM-DD, an optional date in the future. Dates in the future allow user to set up a future dated payment, which will be schedule a payment to be taken at the selected date in the future.
                   type: string
                   format: date
-                  example: 2024-12-30
+                  example: 2025-01-30
                 backURL:
                   description: If this is present HMRC will offer this as a link to the customer at the end of the journey.
                   type: string
@@ -200,13 +199,13 @@ paths:
         - applicationRestricted: [ ]
 
       parameters:
-
         - in: query
           name: clientJourneyId
           required: true
           description: The client's identifier for the journey.
           schema:
             type: string
+            format: uuid
             example: "a218f71d-9bf2-438e-851c-71d50866c2e9"
 
       responses:
@@ -223,23 +222,19 @@ paths:
                     type: string
                     description: The client's identifier for the journey/payment.
                     example: "a218f71d-9bf2-438e-851c-71d50866c2e9"
-
                   taxRegime:
                     type: string
                     description: The tax regime under which the liability has arisen. One of a fixed set.
                     enum: [ SelfAssessment ]
                     example: "SelfAssessment"
-
                   paymentReference:
                     type: string
                     description: The reference identifying the tax liability.
                     example: "1097172564"
-
                   amountInPence:
                     description: Represents the amount actually paid, in pence.
                     type: integer
                     example: 3456
-
                   paymentStatus:
                     description: The status of the payment within the HMRC system.
                     type: string
