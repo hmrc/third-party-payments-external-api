@@ -11,5 +11,6 @@ Content-Type: Application/Json
   "reference": "1234567895",
   "amountInPence": 123,
   "vendorJourneyId": "some-vendor-id",
-  "backURL": "https://www.someBackUrl.com"
+  "backURL": "https://www.someBackUrl.com",
+  "dueDate": "2025-01-31"
 }
