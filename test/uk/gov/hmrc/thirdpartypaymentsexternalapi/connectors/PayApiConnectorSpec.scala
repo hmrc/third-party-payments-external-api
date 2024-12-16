@@ -22,17 +22,19 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata.PayApiTestData
 
+import java.util.UUID
 import scala.concurrent.Future
 
 class PayApiConnectorSpec extends ItSpec {
 
   val payApiConnector: PayApiConnector = app.injector.instanceOf[PayApiConnector]
+  val testUuid: UUID = UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")
 
   "payApiConnector" - {
 
     "startSelfAssessmentJourney" - {
 
-      val testSpjRequest3psSa: SpjRequest3psSa = SpjRequest3psSa("1234567895", 123, None, None, None)
+      val testSpjRequest3psSa: SpjRequest3psSa = SpjRequest3psSa("1234567895", 123, testUuid, None, None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneySelfAssessment()
@@ -52,7 +54,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startVatJourney" - {
 
-      val testSpjRequest3psVat: SpjRequest3psVat = SpjRequest3psVat("1234567895", 123, None, None, None)
+      val testSpjRequest3psVat: SpjRequest3psVat = SpjRequest3psVat("1234567895", 123, testUuid, None, None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyVat()
@@ -72,7 +74,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startCorporationTaxJourney" - {
 
-      val testSpjRequest3psCorporationTax: SpjRequest3psCorporationTax = SpjRequest3psCorporationTax("1234567895", 123, None, None, None)
+      val testSpjRequest3psCorporationTax: SpjRequest3psCorporationTax = SpjRequest3psCorporationTax("1234567895", 123, testUuid, None, None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyCorporationTax()
@@ -92,7 +94,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startEmployersPayAsYouEarnJourney" - {
 
-      val testSpjRequest3psEmployersPayAsYouEarn: SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn("1234567895", 123, None, None, None)
+      val testSpjRequest3psEmployersPayAsYouEarn: SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn("1234567895", 123, testUuid, None, None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyEmployersPayAsYouEarn()

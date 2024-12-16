@@ -25,6 +25,7 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata.PayApiTestData
 
 import java.time.LocalDate
+import java.util.UUID
 
 class PayApiServiceSpec extends ItSpec {
 
@@ -36,7 +37,7 @@ class PayApiServiceSpec extends ItSpec {
     taxRegime       = taxRegime,
     reference       = "someReference",
     amountInPence   = 123,
-    vendorJourneyId = "some-vendor-journey-id",
+    clientJourneyId = UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"),
     backURL         = "some-back-url",
     dueDate         = Some(LocalDate.of(2025, 1, 31))
   )

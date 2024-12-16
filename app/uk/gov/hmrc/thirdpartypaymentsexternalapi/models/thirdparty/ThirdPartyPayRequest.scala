@@ -21,43 +21,48 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
 
 import java.time.LocalDate
+import java.util.UUID
 
 final case class ThirdPartyPayRequest(
     taxRegime:       TaxRegime,
     reference:       String,
     amountInPence:   Int,
-    vendorJourneyId: String,
+    clientJourneyId: UUID,
     backURL:         String,
     dueDate:         Option[LocalDate]
 //TODO: we should introduce some witness types too, not now though.
 ) {
   def asSaSpjRequest(): SpjRequest3psSa = SpjRequest3psSa(
-    utr           = reference,
-    amountInPence = amountInPence,
-    returnUrl     = Some(backURL),
-    backUrl       = Some(backURL),
-    dueDate       = dueDate
+    utr             = reference,
+    amountInPence   = amountInPence,
+    clientJourneyId = clientJourneyId,
+    returnUrl       = Some(backURL),
+    backUrl         = Some(backURL),
+    dueDate         = dueDate
   )
   def asVatSpjRequest(): SpjRequest3psVat = SpjRequest3psVat(
-    vrn           = reference,
-    amountInPence = amountInPence,
-    returnUrl     = Some(backURL),
-    backUrl       = Some(backURL),
-    dueDate       = dueDate
+    vrn             = reference,
+    amountInPence   = amountInPence,
+    clientJourneyId = clientJourneyId,
+    returnUrl       = Some(backURL),
+    backUrl         = Some(backURL),
+    dueDate         = dueDate
   )
   def asCorporationTaxSpjRequest(): SpjRequest3psCorporationTax = SpjRequest3psCorporationTax(
-    vrn           = reference,
-    amountInPence = amountInPence,
-    returnUrl     = Some(backURL),
-    backUrl       = Some(backURL),
-    dueDate       = dueDate
+    vrn             = reference,
+    amountInPence   = amountInPence,
+    clientJourneyId = clientJourneyId,
+    returnUrl       = Some(backURL),
+    backUrl         = Some(backURL),
+    dueDate         = dueDate
   )
   def asEmployersPayAsYouEarnSpjRequest(): SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn(
-    vrn           = reference,
-    amountInPence = amountInPence,
-    returnUrl     = Some(backURL),
-    backUrl       = Some(backURL),
-    dueDate       = dueDate
+    vrn             = reference,
+    amountInPence   = amountInPence,
+    clientJourneyId = clientJourneyId,
+    returnUrl       = Some(backURL),
+    backUrl         = Some(backURL),
+    dueDate         = dueDate
   )
 }
 
