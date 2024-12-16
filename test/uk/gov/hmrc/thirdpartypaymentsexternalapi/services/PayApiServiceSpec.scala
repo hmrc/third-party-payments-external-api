@@ -24,6 +24,8 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata.PayApiTestData
 
+import java.time.LocalDate
+
 class PayApiServiceSpec extends ItSpec {
 
   val payApiService: PayApiService = app.injector.instanceOf[PayApiService]
@@ -35,7 +37,8 @@ class PayApiServiceSpec extends ItSpec {
     reference       = "someReference",
     amountInPence   = 123,
     vendorJourneyId = "some-vendor-journey-id",
-    backURL         = "some-back-url"
+    backURL         = "some-back-url",
+    dueDate         = Some(LocalDate.of(2025, 1, 31))
   )
 
   "PayApiService" - {

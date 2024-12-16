@@ -20,17 +20,19 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
+import java.time.LocalDate
+
 class SpjRequestSpec extends UnitSpec {
 
   "SpjRequest" - {
 
     "SpjRequest3psSa" - {
 
-      val spjRequest = SpjRequest3psSa("1234567895", 123, Some("someurl"), Some("somurl"), Some("someduedate"))
-      val jsValue = Json.parse("""{"utr":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"someduedate"}""")
+      val spjRequest = SpjRequest3psSa("1234567895", 123, Some("someurl"), Some("somurl"), Some(LocalDate.of(2025, 1, 31)))
+      val jsValue = Json.parse("""{"utr":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
 
       "serialise to json" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"utr":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"someduedate"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse("""{"utr":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
       }
 
       "de serialise from json" in {
@@ -40,25 +42,25 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psVat" - {
 
-      val spjRequest = SpjRequest3psVat("1234567895", 123, Some("someurl"), Some("somurl"), Some("someduedate"))
-      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"someduedate"}""")
+      val spjRequest = SpjRequest3psVat("1234567895", 123, Some("someurl"), Some("somurl"), Some(LocalDate.of(2025, 1, 31)))
+      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
 
-      "serialise to json" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"someduedate"}""")
+      "serialise to json with optional due date" in {
+        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
       }
 
-      "de serialise from json" in {
+      "de serialise from json with optional due date" in {
         Json.fromJson[SpjRequest3psVat](jsValue).asEither shouldBe Right(spjRequest)
       }
     }
 
     "SpjRequest3psCorporationTax" - {
 
-      val spjRequest = SpjRequest3psCorporationTax("1234567895", 123, Some("someurl"), Some("somurl"), Some("someduedate"))
-      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"someduedate"}""")
+      val spjRequest = SpjRequest3psCorporationTax("1234567895", 123, Some("someurl"), Some("somurl"), Some(LocalDate.of(2025, 1, 31)))
+      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
 
       "serialise to json" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"someduedate"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
       }
 
       "de serialise from json" in {
@@ -68,11 +70,11 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psEmployersPayAsYouEarn" - {
 
-      val spjRequest = SpjRequest3psEmployersPayAsYouEarn("1234567895", 123, Some("someurl"), Some("somurl"), Some("someduedate"))
-      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"someduedate"}""")
+      val spjRequest = SpjRequest3psEmployersPayAsYouEarn("1234567895", 123, Some("someurl"), Some("somurl"), Some(LocalDate.of(2025, 1, 31)))
+      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
 
       "serialise to json" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"someduedate"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
       }
 
       "de serialise from json" in {

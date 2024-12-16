@@ -18,9 +18,9 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors.PayApiConnector
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

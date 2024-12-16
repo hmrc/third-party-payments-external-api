@@ -26,6 +26,8 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 
+import java.time.LocalDate
+
 class StartPaymentControllerSpec extends ItSpec {
 
   private val startPaymentController = app.injector.instanceOf[StartPaymentController]
@@ -35,7 +37,8 @@ class StartPaymentControllerSpec extends ItSpec {
     reference       = "1234567895",
     amountInPence   = 123,
     vendorJourneyId = "some-vendor-id",
-    backURL         = "https://www.someBackUrl.com"
+    backURL         = "https://www.someBackUrl.com",
+    dueDate         = Some(LocalDate.of(2025, 1, 31))
   )
 
   private def fakeRequest(taxRegime: TaxRegime): FakeRequest[ThirdPartyPayRequest] =
