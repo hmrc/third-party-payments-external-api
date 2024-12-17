@@ -19,15 +19,17 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi
 import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
+import java.util.UUID
 
 sealed trait SpjRequest
 
 final case class SpjRequest3psSa(
-    utr:           String,
-    amountInPence: Int,
-    returnUrl:     Option[String],
-    backUrl:       Option[String],
-    dueDate:       Option[LocalDate]
+    utr:             String,
+    amountInPence:   Int,
+    clientJourneyId: UUID,
+    returnUrl:       Option[String],
+    backUrl:         Option[String],
+    dueDate:         Option[LocalDate]
 ) extends SpjRequest
 
 object SpjRequest3psSa {
@@ -36,11 +38,12 @@ object SpjRequest3psSa {
 }
 
 final case class SpjRequest3psVat(
-    vrn:           String,
-    amountInPence: Int,
-    returnUrl:     Option[String],
-    backUrl:       Option[String],
-    dueDate:       Option[LocalDate]
+    vrn:             String,
+    amountInPence:   Int,
+    clientJourneyId: UUID,
+    returnUrl:       Option[String],
+    backUrl:         Option[String],
+    dueDate:         Option[LocalDate]
 ) extends SpjRequest
 
 object SpjRequest3psVat {
@@ -50,11 +53,12 @@ object SpjRequest3psVat {
 
 //todo jake update when we do that ticket.
 final case class SpjRequest3psCorporationTax(
-    vrn:           String,
-    amountInPence: Int,
-    returnUrl:     Option[String],
-    backUrl:       Option[String],
-    dueDate:       Option[LocalDate]
+    vrn:             String,
+    amountInPence:   Int,
+    clientJourneyId: UUID,
+    returnUrl:       Option[String],
+    backUrl:         Option[String],
+    dueDate:         Option[LocalDate]
 ) extends SpjRequest
 
 object SpjRequest3psCorporationTax {
@@ -64,11 +68,12 @@ object SpjRequest3psCorporationTax {
 
 //todo jake update when we do that ticket.
 final case class SpjRequest3psEmployersPayAsYouEarn(
-    vrn:           String,
-    amountInPence: Int,
-    returnUrl:     Option[String],
-    backUrl:       Option[String],
-    dueDate:       Option[LocalDate]
+    vrn:             String,
+    amountInPence:   Int,
+    clientJourneyId: UUID,
+    returnUrl:       Option[String],
+    backUrl:         Option[String],
+    dueDate:         Option[LocalDate]
 ) extends SpjRequest
 
 object SpjRequest3psEmployersPayAsYouEarn {
