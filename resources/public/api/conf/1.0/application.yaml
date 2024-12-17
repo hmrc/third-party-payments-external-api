@@ -83,24 +83,8 @@ paths:
       requestBody:
         description: |
           The request body always contains the fields that allow HMRC to identify the liability that is being paid, so 
-          that the funds are not mis-allocated. The required fields are the taxRegime, the paymentReference, the amountInPence, dueDate and 
-          a journey identifier called the clientJourneyId.
-          
-          The taxRegime field identifies the tax being paid. Currently supported regimes are: Self Assessment.
-          
-          The paymentReference is the reference supplied by HMRC when the liability arose.
-          
-          The amountInPence is an integer number of pennies that must be greater than or equal to 0. If 0 is provided, the user will be prompted to enter an amount. If non zero is provided, user will be prompted to select the amount or enter another amount.
-          
-          The clientJourneyId field is a UUID (version 4, variant 2) that is supplied by the API user in order to identify 
-          the journey in calls to the /status endpoint.
-          
-          The API user can optionally supply a due date for the liability. This enables the user to setup a scheduled, future dated payment.
-          This date must be in the future in format YYYY-MM-DD and cannot be today's date.
-          
-          The API user can optionally supply an additional URL.
-          
-          A backURL enables HMRC to display a link to the user to allow them to return to their software.
+          that the funds are not mis-allocated. The required fields are the taxRegime, the paymentReference, the amountInPence and 
+          a journey identifier called the clientJourneyId. The dueDate is an optional field that can allow users to setup a payment for a future date.
 
         required: true
         content:
@@ -112,13 +96,15 @@ paths:
               required: [ clientJourneyId, taxRegime, paymentReference, amountInPence ]
               properties:
                 clientJourneyId:
-                  description: The client identifier for this journey. Must be a UUID (version 4, variant 2).
+                  description: |
+                    The client identifier for this journey. Must be a UUID (version 4, variant 2). This field is used to identify the journey in calls to the /status endpoint.
                   type: string
                   format: uuid
                   example: a218f71d-9bf2-438e-851c-71d50866c2e9
                 taxRegime:
                   type: string
-                  description: The tax regime under which the liability has arisen. One of a fixed set.
+                  description: |
+                    The tax regime under which the liability has arisen. One of a fixed set. Currently supported regimes are: Self Assessment.
                   enum: [ SelfAssessment ]
                   example: SelfAssessment
                 paymentReference:
@@ -126,18 +112,18 @@ paths:
                   type: string
                   example: 1097172564
                 amountInPence:
-                  description: The amount to be paid in pennies, so £12.34 is 1234, must be greater than or equal to 0.
+                  description: The amount to be paid in pence, so £12.34 is 1234, must be greater than or equal to 0. If 0 is provided, the user will be prompted to enter an amount. If non zero is provided, the user will be prompted to select the amount or enter another amount.
                   type: integer
                   minimum: 0
                   exclusiveMinimum: false
                   example: 1234
                 dueDate:
-                  description: The due date of the liability in format YYYY-MM-DD, an optional date in the future. Dates in the future allow user to set up a future dated payment, which will be schedule a payment to be taken at the selected date in the future.
+                  description: The due date of the liability in format YYYY-MM-DD, an optional date in the future. Dates in the future allow users to schedule a future dated payment, which will schedule a payment to be taken at the selected date in the future.
                   type: string
                   format: date
                   example: 2025-01-30
                 backURL:
-                  description: If this is present HMRC will offer this as a link to the customer at the end of the journey.
+                  description: If this is present HMRC will offer this as a link to the customer at the end of the journey, this link can allow them to return to their software.
                   type: string
                   format: uri
                   example: "https://some-accounting-software.com/after-pay/a218f71d9bf2438e851c71d50866c2e9"
@@ -236,7 +222,12 @@ paths:
                     type: integer
                     example: 3456
                   paymentStatus:
-                    description: The status of the payment within the HMRC system.
+                    description: |
+                      The status of the payment within the HMRC system.
+                      "Completed" - The user has completed the HMRC payment journey successfully.  It does not mean that a payment has been made to HMRC.  This is dependent on the number of authorisations a payment needs and how long it takes the user's bank to submit the payment to HMRC.
+                      "Failed" - The user's payment journey has failed.  This can be due to a number of reasons - issues at HMRC or the user's bank e.g. insufficient funds, journey timed out before payment authorised, etc.
+                      "Cancelled" - The payment was cancelled by the user before completion.
+                      "Scheduled" - The user has successfully set up a future dated payment.  The payment will be made on the date selected by the user.  The payment can also be cancelled by the user at their bank before the payment date.
                     type: string
                     enum: [ Completed, Failed, Cancelled, Scheduled ]
                     example: "Completed"
