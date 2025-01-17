@@ -1,5 +1,5 @@
 
-### Spj3psSa
+### Spj3psVat
 
 POST http://localhost:10156/pay
 Accept: */*
@@ -7,10 +7,10 @@ Cache-Control: no-cache
 Content-Type: Application/Json
 
 {
-  "taxRegime": "SelfAssessment",
-  "reference": "1234567891",
+  "taxRegime": "Vat",
+  "reference": "101747645",
   "amountInPence": 123,
   "clientJourneyId": "aef0f31b-3c0f-454b-9d1f-07d549987a96",
   "backURL": "https://www.someBackUrl.com",
-  "dueDate": "2025-01-31"
+  "dueDate": "2025-04-31"
 }
