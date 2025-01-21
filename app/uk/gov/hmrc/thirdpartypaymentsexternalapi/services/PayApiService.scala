@@ -18,9 +18,9 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors.PayApiConnector
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseError, ThirdPartyResponseErrors}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty._
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +43,7 @@ class PayApiService @Inject() (
     }
 
     spjResponseF
-      .map(spjResponse => Right(ThirdPartyPayResponse(clientJourneyId, spjResponse.nextUrl)))
+      .map(spjResponse => Right(ThirdPartyPayResponse(clientJourneyId = clientJourneyId, redirectURL = RedirectUrl(spjResponse.nextUrl.value))))
       .recover {
         case _: UpstreamErrorResponse => Left(ThirdPartyResponseErrors.UpstreamError)
       }

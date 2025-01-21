@@ -21,7 +21,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
 import play.mvc.Http.Status
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyPayResponse}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
@@ -42,7 +42,7 @@ class StartPaymentControllerSpec extends ItSpec {
   )
 
   private val clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
-  private val expectedTestThirdPartyPayResponse = ThirdPartyPayResponse(clientJourneyId, "https://somenext-url.co.uk")
+  private val expectedTestThirdPartyPayResponse = ThirdPartyPayResponse(clientJourneyId, RedirectUrl("https://somenext-url.co.uk"))
 
   private def fakeRequest(taxRegime: TaxRegime): FakeRequest[ThirdPartyPayRequest] =
     FakeRequest("POST", "/pay").withBody[ThirdPartyPayRequest](testThirdPartyRequest(taxRegime))

@@ -19,8 +19,8 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi
 import play.api.libs.json.{Json, OFormat}
 
 final case class SpjResponse(
-    journeyId: String,
-    nextUrl:   String
+    journeyId: JourneyId,
+    nextUrl:   NextUrl
 )
 
 object SpjResponse {

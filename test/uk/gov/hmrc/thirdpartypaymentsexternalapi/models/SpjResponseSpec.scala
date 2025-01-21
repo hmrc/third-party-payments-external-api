@@ -17,14 +17,14 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{JourneyId, NextUrl, SpjResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
 class SpjResponseSpec extends UnitSpec {
 
   "SpjResponse" - {
 
-    val spjResponse = SpjResponse("some-journey-id", "some-next-url")
+    val spjResponse = SpjResponse(JourneyId("some-journey-id"), NextUrl("some-next-url"))
     val jsValue = Json.parse("""{"journeyId":"some-journey-id","nextUrl":"some-next-url"}""")
 
     "serialise to json" in {

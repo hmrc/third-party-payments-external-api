@@ -19,7 +19,7 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 
@@ -42,7 +42,7 @@ class PayApiServiceSpec extends ItSpec {
 
   val testThirdPartyPayResponse: ThirdPartyPayResponse = ThirdPartyPayResponse(
     clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")),
-    redirectURL     = "https://somenext-url.co.uk"
+    redirectURL     = RedirectUrl("https://somenext-url.co.uk")
   )
 
   "PayApiService" - {

@@ -19,7 +19,7 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 
-final case class ThirdPartyPayResponse(clientJourneyId: ClientJourneyId, redirectURL: String)
+final case class ThirdPartyPayResponse(clientJourneyId: ClientJourneyId, redirectURL: RedirectUrl)
 
 object ThirdPartyPayResponse {
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
