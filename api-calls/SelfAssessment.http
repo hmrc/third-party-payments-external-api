@@ -10,7 +10,6 @@ Content-Type: Application/Json
   "taxRegime": "SelfAssessment",
   "reference": "1234567891",
   "amountInPence": 123,
-  "clientJourneyId": "aef0f31b-3c0f-454b-9d1f-07d549987a96",
   "backURL": "https://www.someBackUrl.com",
   "dueDate": "2025-01-31"
 }

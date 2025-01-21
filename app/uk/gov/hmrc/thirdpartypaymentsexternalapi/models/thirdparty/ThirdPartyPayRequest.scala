@@ -17,22 +17,21 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 
 import java.time.LocalDate
-import java.util.UUID
 
 final case class ThirdPartyPayRequest(
-    taxRegime:       TaxRegime,
-    reference:       String,
-    amountInPence:   Int,
-    clientJourneyId: UUID,
-    backURL:         String,
-    dueDate:         Option[LocalDate]
+    taxRegime:     TaxRegime,
+    reference:     String,
+    amountInPence: Int,
+    backURL:       String,
+    dueDate:       Option[LocalDate]
 //TODO: we should introduce some witness types too, not now though.
 ) {
-  def asSaSpjRequest(): SpjRequest3psSa = SpjRequest3psSa(
+
+  def asSaSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psSa = SpjRequest3psSa(
     utr             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
@@ -40,7 +39,7 @@ final case class ThirdPartyPayRequest(
     backUrl         = Some(backURL),
     dueDate         = dueDate
   )
-  def asVatSpjRequest(): SpjRequest3psVat = SpjRequest3psVat(
+  def asVatSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psVat = SpjRequest3psVat(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
@@ -48,7 +47,7 @@ final case class ThirdPartyPayRequest(
     backUrl         = Some(backURL),
     dueDate         = dueDate
   )
-  def asCorporationTaxSpjRequest(): SpjRequest3psCorporationTax = SpjRequest3psCorporationTax(
+  def asCorporationTaxSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psCorporationTax = SpjRequest3psCorporationTax(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
@@ -56,7 +55,7 @@ final case class ThirdPartyPayRequest(
     backUrl         = Some(backURL),
     dueDate         = dueDate
   )
-  def asEmployersPayAsYouEarnSpjRequest(): SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn(
+  def asEmployersPayAsYouEarnSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,

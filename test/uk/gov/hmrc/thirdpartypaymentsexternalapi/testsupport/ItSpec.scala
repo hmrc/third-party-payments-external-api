@@ -16,15 +16,20 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport
 
+import com.google.inject.{AbstractModule, Provides, Singleton}
 import org.apache.pekko.stream.Materializer
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import uk.gov.hmrc.http.test.WireMockSupport
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.ClientJourneyIdGeneratorService
 
+import java.util.UUID
+import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 
 trait ItSpec extends AnyFreeSpecLike
@@ -43,7 +48,16 @@ trait ItSpec extends AnyFreeSpecLike
     "microservice.services.pay-api.port" -> self.wireMockPort
   )
 
-  override def fakeApplication(): Application = new GuiceApplicationBuilder()
-    .configure(configMap).build()
+  lazy val overridesModule: AbstractModule = new AbstractModule {
+    @Provides
+    @Singleton
+    @nowarn // silence "method never used" warning
+    def staticClientJourneyIdGenerator(): ClientJourneyIdGeneratorService = new ClientJourneyIdGeneratorService {
+      override def nextClientJourneyId(): ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+    }
+  }
 
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
+    .overrides(GuiceableModule.fromGuiceModule(overridesModule))
+    .configure(configMap).build()
 }

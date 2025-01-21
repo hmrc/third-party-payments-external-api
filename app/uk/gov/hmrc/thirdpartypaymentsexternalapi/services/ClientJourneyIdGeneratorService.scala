@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty
+package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
-import play.api.libs.json.{Json, OFormat}
+import jakarta.inject.Singleton
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 
-final case class ThirdPartyPayResponse(clientJourneyId: ClientJourneyId, redirectURL: String)
+import java.util.UUID
 
-object ThirdPartyPayResponse {
-  @SuppressWarnings(Array("org.wartremover.warts.Any"))
-  implicit val format: OFormat[ThirdPartyPayResponse] = Json.format[ThirdPartyPayResponse]
-}
-
-sealed trait ThirdPartyResponseError {
-  val errorMessage: String
-}
-
-object ThirdPartyResponseErrors {
-  case object UpstreamError extends ThirdPartyResponseError {
-    val errorMessage = "Error from upstream"
-  }
+@Singleton
+class ClientJourneyIdGeneratorService {
+  def nextClientJourneyId(): ClientJourneyId = ClientJourneyId(UUID.randomUUID())
 }

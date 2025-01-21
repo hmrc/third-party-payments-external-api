@@ -17,12 +17,11 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseErrors}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata.PayApiTestData
 
 import java.time.LocalDate
 import java.util.UUID
@@ -34,45 +33,49 @@ class PayApiServiceSpec extends ItSpec {
   implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   def thirdPartyPayRequest(taxRegime: TaxRegime): ThirdPartyPayRequest = ThirdPartyPayRequest(
-    taxRegime       = taxRegime,
-    reference       = "someReference",
-    amountInPence   = 123,
-    clientJourneyId = UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"),
-    backURL         = "some-back-url",
-    dueDate         = Some(LocalDate.of(2025, 1, 31))
+    taxRegime     = taxRegime,
+    reference     = "someReference",
+    amountInPence = 123,
+    backURL       = "some-back-url",
+    dueDate       = Some(LocalDate.of(2025, 1, 31))
+  )
+
+  val testThirdPartyPayResponse: ThirdPartyPayResponse = ThirdPartyPayResponse(
+    clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")),
+    redirectURL     = "https://somenext-url.co.uk"
   )
 
   "PayApiService" - {
 
     "startPaymentJourney" - {
 
-      "return a Right[SpjResponse] when pay-api call succeeds" - {
+      "return a Right[ThirdPartyPayResponse] when pay-api call succeeds" - {
 
         "for Self Assessment" in {
           PayApiStub.stubForStartJourneySelfAssessment()
           val result = payApiService.startPaymentJourney(thirdPartyPayRequest(SelfAssessment))
-          result.futureValue shouldBe Right(PayApiTestData.spjResponse)
+          result.futureValue shouldBe Right(testThirdPartyPayResponse)
           PayApiStub.verifyStartJourneySelfAssessment(count = 1)
         }
 
         "for Vat" in {
           PayApiStub.stubForStartJourneyVat()
           val result = payApiService.startPaymentJourney(thirdPartyPayRequest(Vat))
-          result.futureValue shouldBe Right(PayApiTestData.spjResponse)
+          result.futureValue shouldBe Right(testThirdPartyPayResponse)
           PayApiStub.verifyStartJourneyVat(count = 1)
         }
 
         "for Corporation Tax" in {
           PayApiStub.stubForStartJourneyCorporationTax()
           val result = payApiService.startPaymentJourney(thirdPartyPayRequest(CorporationTax))
-          result.futureValue shouldBe Right(PayApiTestData.spjResponse)
+          result.futureValue shouldBe Right(testThirdPartyPayResponse)
           PayApiStub.verifyStartJourneyCorporationTax(count = 1)
         }
 
         "for Employers Pay As You Earn" in {
           PayApiStub.stubForStartJourneyEmployersPayAsYouEarn()
           val result = payApiService.startPaymentJourney(thirdPartyPayRequest(EmployersPayAsYouEarn))
-          result.futureValue shouldBe Right(PayApiTestData.spjResponse)
+          result.futureValue shouldBe Right(testThirdPartyPayResponse)
           PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
         }
       }
