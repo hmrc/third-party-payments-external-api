@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata
+package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi
 
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{JourneyId, NextUrl, SpjResponse}
+import play.api.libs.json.{Json, Format}
 
-object PayApiTestData {
+final case class JourneyId(value: String) extends AnyVal
 
-  val spjResponse: SpjResponse = SpjResponse(JourneyId("some-journey-id"), NextUrl("https://somenext-url.co.uk"))
-
+object JourneyId {
+  implicit val format: Format[JourneyId] = Json.valueFormat[JourneyId]
 }

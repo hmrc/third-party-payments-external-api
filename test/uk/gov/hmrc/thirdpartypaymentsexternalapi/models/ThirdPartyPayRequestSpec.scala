@@ -29,18 +29,17 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
 
   "ThirdPartyPayRequest" - {
 
-    val testUuid = UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")
+    val testClientJourneyId: ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
 
       def thirdPartyPayRequest(taxRegime: TaxRegime): ThirdPartyPayRequest = ThirdPartyPayRequest(
-        taxRegime       = taxRegime,
-        reference       = "someReference",
-        amountInPence   = 123,
-        clientJourneyId = testUuid,
-        backURL         = "some-back-url",
-        dueDate         = Some(LocalDate.of(2025, 1, 31))
+        taxRegime     = taxRegime,
+        reference     = "someReference",
+        amountInPence = 123,
+        backURL       = "some-back-url",
+        dueDate       = Some(LocalDate.of(2025, 1, 31))
       )
 
-      def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","backURL":"some-back-url","dueDate":"2025-01-31"}""")
+      def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"backURL":"some-back-url","dueDate":"2025-01-31"}""")
 
     "serialise to json" in {
       Json.toJson(thirdPartyPayRequest(SelfAssessment)) shouldBe jsValue("SelfAssessment")
@@ -51,23 +50,23 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
     }
 
     "asSaSpjRequest correctly creates SpjRequest3psSa" in {
-      val spjRequest = SpjRequest3psSa("someReference", 123, testUuid, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
-      thirdPartyPayRequest(SelfAssessment).asSaSpjRequest() shouldBe spjRequest
+      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
+      thirdPartyPayRequest(SelfAssessment).asSaSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 
     "asVatSpjRequest correctly creates SpjRequest3psVat" in {
-      val spjRequest = SpjRequest3psVat("someReference", 123, testUuid, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
-      thirdPartyPayRequest(Vat).asVatSpjRequest() shouldBe spjRequest
+      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
+      thirdPartyPayRequest(Vat).asVatSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 
     "asCorporationTaxSpjRequest correctly creates SpjRequest3psCorporationTax" in {
-      val spjRequest = SpjRequest3psCorporationTax("someReference", 123, testUuid, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
-      thirdPartyPayRequest(CorporationTax).asCorporationTaxSpjRequest() shouldBe spjRequest
+      val spjRequest = SpjRequest3psCorporationTax("someReference", 123, testClientJourneyId, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
+      thirdPartyPayRequest(CorporationTax).asCorporationTaxSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 
     "asEmployersPayAsYouEarnSpjRequest correctly creates SpjRequest3psEmployersPayAsYouEarn" in {
-      val spjRequest = SpjRequest3psEmployersPayAsYouEarn("someReference", 123, testUuid, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
-      thirdPartyPayRequest(EmployersPayAsYouEarn).asEmployersPayAsYouEarnSpjRequest() shouldBe spjRequest
+      val spjRequest = SpjRequest3psEmployersPayAsYouEarn("someReference", 123, testClientJourneyId, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
+      thirdPartyPayRequest(EmployersPayAsYouEarn).asEmployersPayAsYouEarnSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
   }
 }

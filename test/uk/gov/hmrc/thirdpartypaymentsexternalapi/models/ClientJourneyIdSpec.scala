@@ -16,23 +16,21 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
-import play.api.libs.json.Json
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{JourneyId, NextUrl, SpjResponse}
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
-class SpjResponseSpec extends UnitSpec {
+import java.util.UUID
 
-  "SpjResponse" - {
+class ClientJourneyIdSpec extends UnitSpec {
 
-    val spjResponse = SpjResponse(JourneyId("some-journey-id"), NextUrl("some-next-url"))
-    val jsValue = Json.parse("""{"journeyId":"some-journey-id","nextUrl":"some-next-url"}""")
-
+  "ClientJourneyId" - {
     "serialise to json" in {
-      Json.toJson(spjResponse) shouldBe jsValue
+      Json.toJson(ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))) shouldBe JsString("aef0f31b-3c0f-454b-9d1f-07d549987a96")
     }
 
     "de serialise from json" in {
-      Json.fromJson[SpjResponse](jsValue).asEither shouldBe Right(spjResponse)
+      Json.fromJson[ClientJourneyId](JsString("aef0f31b-3c0f-454b-9d1f-07d549987a96")).asEither shouldBe Right(ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")))
     }
   }
+
 }

@@ -18,26 +18,32 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors.PayApiConnector
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty._
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PayApiService @Inject() (payApiConnector: PayApiConnector)(implicit executionContext: ExecutionContext) {
+class PayApiService @Inject() (
+    payApiConnector:                 PayApiConnector,
+    clientJourneyIdGeneratorService: ClientJourneyIdGeneratorService
+)(implicit executionContext: ExecutionContext) {
 
-  def startPaymentJourney(thirdPartyPayRequest: ThirdPartyPayRequest)(implicit headerCarrier: HeaderCarrier): Future[Either[ThirdPartyResponseError, SpjResponse]] = {
+  def startPaymentJourney(thirdPartyPayRequest: ThirdPartyPayRequest)(implicit headerCarrier: HeaderCarrier): Future[Either[ThirdPartyResponseError, ThirdPartyPayResponse]] = {
+
+    val clientJourneyId: ClientJourneyId = clientJourneyIdGeneratorService.nextClientJourneyId()
+
     val spjResponseF: Future[SpjResponse] = thirdPartyPayRequest.taxRegime match {
-      case TaxRegime.SelfAssessment        => payApiConnector.startSelfAssessmentJourney(thirdPartyPayRequest.asSaSpjRequest())
-      case TaxRegime.Vat                   => payApiConnector.startVatJourney(thirdPartyPayRequest.asVatSpjRequest())
-      case TaxRegime.CorporationTax        => payApiConnector.startCorporationTaxJourney(thirdPartyPayRequest.asCorporationTaxSpjRequest())
-      case TaxRegime.EmployersPayAsYouEarn => payApiConnector.startEmployersPayAsYouEarnJourney(thirdPartyPayRequest.asEmployersPayAsYouEarnSpjRequest())
+      case TaxRegime.SelfAssessment        => payApiConnector.startSelfAssessmentJourney(thirdPartyPayRequest.asSaSpjRequest(clientJourneyId))
+      case TaxRegime.Vat                   => payApiConnector.startVatJourney(thirdPartyPayRequest.asVatSpjRequest(clientJourneyId))
+      case TaxRegime.CorporationTax        => payApiConnector.startCorporationTaxJourney(thirdPartyPayRequest.asCorporationTaxSpjRequest(clientJourneyId))
+      case TaxRegime.EmployersPayAsYouEarn => payApiConnector.startEmployersPayAsYouEarnJourney(thirdPartyPayRequest.asEmployersPayAsYouEarnSpjRequest(clientJourneyId))
     }
 
     spjResponseF
-      .map(Right(_))
+      .map(spjResponse => Right(ThirdPartyPayResponse(clientJourneyId = clientJourneyId, redirectURL = RedirectUrl(spjResponse.nextUrl.value))))
       .recover {
         case _: UpstreamErrorResponse => Left(ThirdPartyResponseErrors.UpstreamError)
       }

@@ -21,8 +21,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
 import play.mvc.Http.Status
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyPayResponse}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 
@@ -34,13 +34,15 @@ class StartPaymentControllerSpec extends ItSpec {
   private val startPaymentController = app.injector.instanceOf[StartPaymentController]
 
   private def testThirdPartyRequest(taxRegime: TaxRegime): ThirdPartyPayRequest = ThirdPartyPayRequest(
-    taxRegime       = taxRegime,
-    reference       = "1234567895",
-    amountInPence   = 123,
-    clientJourneyId = UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"),
-    backURL         = "https://www.someBackUrl.com",
-    dueDate         = Some(LocalDate.of(2025, 1, 31))
+    taxRegime     = taxRegime,
+    reference     = "1234567895",
+    amountInPence = 123,
+    backURL       = "https://www.someBackUrl.com",
+    dueDate       = Some(LocalDate.of(2025, 1, 31))
   )
+
+  private val clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+  private val expectedTestThirdPartyPayResponse = ThirdPartyPayResponse(clientJourneyId, RedirectUrl("https://somenext-url.co.uk"))
 
   private def fakeRequest(taxRegime: TaxRegime): FakeRequest[ThirdPartyPayRequest] =
     FakeRequest("POST", "/pay").withBody[ThirdPartyPayRequest](testThirdPartyRequest(taxRegime))
@@ -53,7 +55,7 @@ class StartPaymentControllerSpec extends ItSpec {
         PayApiStub.stubForStartJourneySelfAssessment()
         val result = startPaymentController.pay()(fakeRequest(SelfAssessment))
         status(result) shouldBe Status.CREATED
-        contentAsJson(result) shouldBe Json.toJson(ThirdPartyPayResponse("https://somenext-url.co.uk"))
+        contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
 
@@ -61,7 +63,7 @@ class StartPaymentControllerSpec extends ItSpec {
         PayApiStub.stubForStartJourneyVat()
         val result = startPaymentController.pay()(fakeRequest(Vat))
         status(result) shouldBe Status.CREATED
-        contentAsJson(result) shouldBe Json.toJson(ThirdPartyPayResponse("https://somenext-url.co.uk"))
+        contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         PayApiStub.verifyStartJourneyVat(count = 1)
       }
 
@@ -69,7 +71,7 @@ class StartPaymentControllerSpec extends ItSpec {
         PayApiStub.stubForStartJourneyCorporationTax()
         val result = startPaymentController.pay()(fakeRequest(CorporationTax))
         status(result) shouldBe Status.CREATED
-        contentAsJson(result) shouldBe Json.toJson(ThirdPartyPayResponse("https://somenext-url.co.uk"))
+        contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
 
@@ -77,7 +79,7 @@ class StartPaymentControllerSpec extends ItSpec {
         PayApiStub.stubForStartJourneyEmployersPayAsYouEarn()
         val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn))
         status(result) shouldBe Status.CREATED
-        contentAsJson(result) shouldBe Json.toJson(ThirdPartyPayResponse("https://somenext-url.co.uk"))
+        contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
     }

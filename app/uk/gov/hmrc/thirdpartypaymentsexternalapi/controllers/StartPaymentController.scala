@@ -19,7 +19,7 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseError, ThirdPartyResponseErrors}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.PayApiService
 
 import javax.inject.{Inject, Singleton}
@@ -33,8 +33,8 @@ class StartPaymentController @Inject() (cc: ControllerComponents, payApiService:
     payApiService
       .startPaymentJourney(request.body)
       .map {
-        case Left(error)        => thirdPartyResponseErrorToResult(error)
-        case Right(spjResponse) => Created(Json.toJson(ThirdPartyPayResponse(spjResponse.nextUrl)))
+        case Left(error)                  => thirdPartyResponseErrorToResult(error)
+        case Right(thirdPartyPayResponse) => Created(Json.toJson(thirdPartyPayResponse))
       }
   }
 

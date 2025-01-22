@@ -16,23 +16,20 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
-import play.api.libs.json.Json
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{JourneyId, NextUrl, SpjResponse}
+import play.api.libs.json.{JsString, Json}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.NextUrl
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
-class SpjResponseSpec extends UnitSpec {
+class RedirectUrlSpec extends UnitSpec {
 
-  "SpjResponse" - {
-
-    val spjResponse = SpjResponse(JourneyId("some-journey-id"), NextUrl("some-next-url"))
-    val jsValue = Json.parse("""{"journeyId":"some-journey-id","nextUrl":"some-next-url"}""")
-
+  "NextUrl" - {
     "serialise to json" in {
-      Json.toJson(spjResponse) shouldBe jsValue
+      Json.toJson(NextUrl("https://www.some-url.com")) shouldBe JsString("https://www.some-url.com")
     }
 
     "de serialise from json" in {
-      Json.fromJson[SpjResponse](jsValue).asEither shouldBe Right(spjResponse)
+      Json.fromJson[NextUrl](JsString("https://www.some-url.com")).asEither shouldBe Right(NextUrl("https://www.some-url.com"))
     }
   }
+
 }
