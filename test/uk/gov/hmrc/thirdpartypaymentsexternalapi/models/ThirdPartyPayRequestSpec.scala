@@ -35,11 +35,12 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
         taxRegime     = taxRegime,
         reference     = "someReference",
         amountInPence = 123,
+        friendlyName  = Some("Test Company"),
         backURL       = "some-back-url",
         dueDate       = Some(LocalDate.of(2025, 1, 31))
       )
 
-      def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"backURL":"some-back-url","dueDate":"2025-01-31"}""")
+      def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"some-back-url","dueDate":"2025-01-31"}""")
 
     "serialise to json" in {
       Json.toJson(thirdPartyPayRequest(SelfAssessment)) shouldBe jsValue("SelfAssessment")
@@ -50,12 +51,12 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
     }
 
     "asSaSpjRequest correctly creates SpjRequest3psSa" in {
-      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
+      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
       thirdPartyPayRequest(SelfAssessment).asSaSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 
     "asVatSpjRequest correctly creates SpjRequest3psVat" in {
-      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
+      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
       thirdPartyPayRequest(Vat).asVatSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 

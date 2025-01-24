@@ -26,6 +26,7 @@ final case class ThirdPartyPayRequest(
     taxRegime:     TaxRegime,
     reference:     String,
     amountInPence: Int,
+    friendlyName:  Option[String],
     backURL:       String,
     dueDate:       Option[LocalDate]
 //TODO: we should introduce some witness types too, not now though.
@@ -35,6 +36,7 @@ final case class ThirdPartyPayRequest(
     utr             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
+    friendlyName    = friendlyName,
     returnUrl       = Some(backURL),
     backUrl         = Some(backURL),
     dueDate         = dueDate
@@ -43,6 +45,7 @@ final case class ThirdPartyPayRequest(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
+    friendlyName    = friendlyName,
     returnUrl       = Some(backURL),
     backUrl         = Some(backURL),
     dueDate         = dueDate
