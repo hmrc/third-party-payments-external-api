@@ -20,48 +20,35 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 
-import java.time.LocalDate
-
-final case class ThirdPartyPayRequest(
-    taxRegime:     TaxRegime,
-    reference:     String,
-    amountInPence: Int,
-    backURL:       String,
-    dueDate:       Option[LocalDate]
-//TODO: we should introduce some witness types too, not now though.
-) {
+final case class ThirdPartyPayRequest(taxRegime: TaxRegime, reference: String, amountInPence: Int, backURL: String) {
 
   def asSaSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psSa = SpjRequest3psSa(
     utr             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
     returnUrl       = Some(backURL),
-    backUrl         = Some(backURL),
-    dueDate         = dueDate
+    backUrl         = Some(backURL)
   )
   def asVatSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psVat = SpjRequest3psVat(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
     returnUrl       = Some(backURL),
-    backUrl         = Some(backURL),
-    dueDate         = dueDate
+    backUrl         = Some(backURL)
   )
   def asCorporationTaxSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psCorporationTax = SpjRequest3psCorporationTax(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
     returnUrl       = Some(backURL),
-    backUrl         = Some(backURL),
-    dueDate         = dueDate
+    backUrl         = Some(backURL)
   )
   def asEmployersPayAsYouEarnSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
     returnUrl       = Some(backURL),
-    backUrl         = Some(backURL),
-    dueDate         = dueDate
+    backUrl         = Some(backURL)
   )
 }
 
