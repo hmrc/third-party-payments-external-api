@@ -17,13 +17,12 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 
-import java.time.LocalDate
 import java.util.UUID
 
 class PayApiServiceSpec extends ItSpec {
@@ -36,8 +35,7 @@ class PayApiServiceSpec extends ItSpec {
     taxRegime     = taxRegime,
     reference     = "someReference",
     amountInPence = 123,
-    backURL       = "some-back-url",
-    dueDate       = Some(LocalDate.of(2025, 1, 31))
+    backURL       = "some-back-url"
   )
 
   val testThirdPartyPayResponse: ThirdPartyPayResponse = ThirdPartyPayResponse(
