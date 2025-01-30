@@ -36,6 +36,7 @@ class PayApiServiceSpec extends ItSpec {
     taxRegime     = taxRegime,
     reference     = "someReference",
     amountInPence = 123,
+    friendlyName  = Some("Test Company"),
     backURL       = "some-back-url",
     dueDate       = Some(LocalDate.of(2025, 1, 31))
   )
