@@ -23,7 +23,6 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl,
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 
-import java.time.LocalDate
 import java.util.UUID
 
 class PayApiServiceSpec extends ItSpec {
@@ -37,8 +36,7 @@ class PayApiServiceSpec extends ItSpec {
     reference     = "someReference",
     amountInPence = 123,
     friendlyName  = Some("Test Company"),
-    backURL       = "some-back-url",
-    dueDate       = Some(LocalDate.of(2025, 1, 31))
+    backURL       = "some-back-url"
   )
 
   val testThirdPartyPayResponse: ThirdPartyPayResponse = ThirdPartyPayResponse(

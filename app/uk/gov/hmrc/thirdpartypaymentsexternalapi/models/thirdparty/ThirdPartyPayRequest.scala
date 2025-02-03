@@ -20,15 +20,12 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 
-import java.time.LocalDate
-
 final case class ThirdPartyPayRequest(
     taxRegime:     TaxRegime,
     reference:     String,
     amountInPence: Int,
     friendlyName:  Option[String],
-    backURL:       String,
-    dueDate:       Option[LocalDate]
+    backURL:       String
 //TODO: we should introduce some witness types too, not now though.
 ) {
 

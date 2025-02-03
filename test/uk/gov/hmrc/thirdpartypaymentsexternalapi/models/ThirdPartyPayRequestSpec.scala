@@ -22,7 +22,6 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCor
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.ThirdPartyPayRequest
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
-import java.time.LocalDate
 import java.util.UUID
 
 class ThirdPartyPayRequestSpec extends UnitSpec {
@@ -36,11 +35,10 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
         reference     = "someReference",
         amountInPence = 123,
         friendlyName  = Some("Test Company"),
-        backURL       = "some-back-url",
-        dueDate       = Some(LocalDate.of(2025, 1, 31))
+        backURL       = "some-back-url"
       )
 
-      def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"some-back-url","dueDate":"2025-01-31"}""")
+      def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"some-back-url"}""")
 
     "serialise to json" in {
       Json.toJson(thirdPartyPayRequest(SelfAssessment)) shouldBe jsValue("SelfAssessment")

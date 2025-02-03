@@ -26,7 +26,6 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxReg
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 
-import java.time.LocalDate
 import java.util.UUID
 
 class StartPaymentControllerSpec extends ItSpec {
@@ -38,8 +37,7 @@ class StartPaymentControllerSpec extends ItSpec {
     reference     = "1234567895",
     amountInPence = 123,
     friendlyName  = Some("Test Company"),
-    backURL       = "https://www.someBackUrl.com",
-    dueDate       = Some(LocalDate.of(2025, 1, 31))
+    backURL       = "https://www.someBackUrl.com"
   )
 
   private val clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
