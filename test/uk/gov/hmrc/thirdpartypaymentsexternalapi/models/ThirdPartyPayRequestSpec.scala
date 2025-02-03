@@ -51,12 +51,12 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
     }
 
     "asSaSpjRequest correctly creates SpjRequest3psSa" in {
-      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
+      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"))
       thirdPartyPayRequest(SelfAssessment).asSaSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 
     "asVatSpjRequest correctly creates SpjRequest3psVat" in {
-      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"), Some(LocalDate.of(2025, 1, 31)))
+      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"))
       thirdPartyPayRequest(Vat).asVatSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 

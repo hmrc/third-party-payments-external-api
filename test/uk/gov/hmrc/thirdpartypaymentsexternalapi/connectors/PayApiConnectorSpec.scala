@@ -36,7 +36,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startSelfAssessmentJourney" - {
 
-      val testSpjRequest3psSa: SpjRequest3psSa = SpjRequest3psSa("1234567895", 123, testClientJourneyId, Some(testFriendlyName), None, None, None)
+      val testSpjRequest3psSa: SpjRequest3psSa = SpjRequest3psSa("1234567895", 123, testClientJourneyId, Some(testFriendlyName), None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneySelfAssessment()
@@ -56,7 +56,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startVatJourney" - {
 
-      val testSpjRequest3psVat: SpjRequest3psVat = SpjRequest3psVat("1234567895", 123, testClientJourneyId, Some(testFriendlyName), None, None, None)
+      val testSpjRequest3psVat: SpjRequest3psVat = SpjRequest3psVat("1234567895", 123, testClientJourneyId, Some(testFriendlyName), None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyVat()

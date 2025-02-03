@@ -20,7 +20,6 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
-import java.time.LocalDate
 import java.util.UUID
 
 class SpjRequestSpec extends UnitSpec {
@@ -31,15 +30,15 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psSa" - {
 
-      val spjRequest = SpjRequest3psSa("1234567895", 123, testClientJourneyId, Some("Test Company"), Some("someurl"), Some("somurl"), Some(LocalDate.of(2025, 1, 31)))
-      val jsValue = Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
+      val spjRequest = SpjRequest3psSa("1234567895", 123, testClientJourneyId, Some("Test Company"), Some("someurl"), Some("somurl"))
+      val jsValue = Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
 
       "serialise to json with optional due date" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
       }
 
       "serialise to json" in {
-        Json.toJson(spjRequest.copy(dueDate = None)) shouldBe Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
       }
 
       "de serialise from json" in {
@@ -49,14 +48,14 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psVat" - {
 
-      val spjRequest = SpjRequest3psVat("1234567895", 123, testClientJourneyId, Some("Test Company"), Some("someurl"), Some("somurl"), Some(LocalDate.of(2025, 1, 31)))
-      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
+      val spjRequest = SpjRequest3psVat("1234567895", 123, testClientJourneyId, Some("Test Company"), Some("someurl"), Some("somurl"))
+      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
 
       "serialise to json with optional due date" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl","dueDate":"2025-01-31"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
       }
       "serialise to json" in {
-        Json.toJson(spjRequest.copy(dueDate = None)) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
       }
 
       "de serialise from json with optional due date" in {
