@@ -38,8 +38,7 @@ final case class ThirdPartyPayRequest(
     clientJourneyId = clientJourneyId,
     friendlyName    = friendlyName,
     returnUrl       = Some(backURL),
-    backUrl         = Some(backURL),
-    dueDate         = dueDate
+    backUrl         = Some(backURL)
   )
   def asVatSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psVat = SpjRequest3psVat(
     vrn             = reference,
@@ -47,24 +46,21 @@ final case class ThirdPartyPayRequest(
     clientJourneyId = clientJourneyId,
     friendlyName    = friendlyName,
     returnUrl       = Some(backURL),
-    backUrl         = Some(backURL),
-    dueDate         = dueDate
+    backUrl         = Some(backURL)
   )
   def asCorporationTaxSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psCorporationTax = SpjRequest3psCorporationTax(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
     returnUrl       = Some(backURL),
-    backUrl         = Some(backURL),
-    dueDate         = dueDate
+    backUrl         = Some(backURL)
   )
   def asEmployersPayAsYouEarnSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
     returnUrl       = Some(backURL),
-    backUrl         = Some(backURL),
-    dueDate         = dueDate
+    backUrl         = Some(backURL)
   )
 }
 

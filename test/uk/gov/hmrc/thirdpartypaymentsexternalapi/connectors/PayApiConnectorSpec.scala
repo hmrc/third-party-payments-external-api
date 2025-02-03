@@ -76,7 +76,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startCorporationTaxJourney" - {
 
-      val testSpjRequest3psCorporationTax: SpjRequest3psCorporationTax = SpjRequest3psCorporationTax("1234567895", 123, testClientJourneyId, None, None, None)
+      val testSpjRequest3psCorporationTax: SpjRequest3psCorporationTax = SpjRequest3psCorporationTax("1234567895", 123, testClientJourneyId, None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyCorporationTax()
@@ -96,7 +96,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startEmployersPayAsYouEarnJourney" - {
 
-      val testSpjRequest3psEmployersPayAsYouEarn: SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn("1234567895", 123, testClientJourneyId, None, None, None)
+      val testSpjRequest3psEmployersPayAsYouEarn: SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn("1234567895", 123, testClientJourneyId, None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyEmployersPayAsYouEarn()

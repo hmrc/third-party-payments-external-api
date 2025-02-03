@@ -19,8 +19,6 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 
-import java.time.LocalDate
-
 sealed trait SpjRequest
 
 final case class SpjRequest3psSa(
@@ -29,8 +27,7 @@ final case class SpjRequest3psSa(
     clientJourneyId: ClientJourneyId,
     friendlyName:    Option[String],
     returnUrl:       Option[String],
-    backUrl:         Option[String],
-    dueDate:         Option[LocalDate]
+    backUrl:         Option[String]
 ) extends SpjRequest
 
 object SpjRequest3psSa {
@@ -44,8 +41,7 @@ final case class SpjRequest3psVat(
     clientJourneyId: ClientJourneyId,
     friendlyName:    Option[String],
     returnUrl:       Option[String],
-    backUrl:         Option[String],
-    dueDate:         Option[LocalDate]
+    backUrl:         Option[String]
 ) extends SpjRequest
 
 object SpjRequest3psVat {
@@ -59,8 +55,7 @@ final case class SpjRequest3psCorporationTax(
     amountInPence:   Int,
     clientJourneyId: ClientJourneyId,
     returnUrl:       Option[String],
-    backUrl:         Option[String],
-    dueDate:         Option[LocalDate]
+    backUrl:         Option[String]
 ) extends SpjRequest
 
 object SpjRequest3psCorporationTax {
@@ -74,8 +69,7 @@ final case class SpjRequest3psEmployersPayAsYouEarn(
     amountInPence:   Int,
     clientJourneyId: ClientJourneyId,
     returnUrl:       Option[String],
-    backUrl:         Option[String],
-    dueDate:         Option[LocalDate]
+    backUrl:         Option[String]
 ) extends SpjRequest
 
 object SpjRequest3psEmployersPayAsYouEarn {
