@@ -25,6 +25,7 @@ final case class SpjRequest3psSa(
     utr:             String,
     amountInPence:   Int,
     clientJourneyId: ClientJourneyId,
+    friendlyName:    Option[String],
     returnUrl:       Option[String],
     backUrl:         Option[String]
 ) extends SpjRequest
@@ -38,6 +39,7 @@ final case class SpjRequest3psVat(
     vrn:             String,
     amountInPence:   Int,
     clientJourneyId: ClientJourneyId,
+    friendlyName:    Option[String],
     returnUrl:       Option[String],
     backUrl:         Option[String]
 ) extends SpjRequest

@@ -30,9 +30,15 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
 
     val testClientJourneyId: ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
 
-      def thirdPartyPayRequest(taxRegime: TaxRegime): ThirdPartyPayRequest = ThirdPartyPayRequest(taxRegime     = taxRegime, reference = "someReference", amountInPence = 123, backURL = "some-back-url")
+      def thirdPartyPayRequest(taxRegime: TaxRegime): ThirdPartyPayRequest = ThirdPartyPayRequest(
+        taxRegime     = taxRegime,
+        reference     = "someReference",
+        amountInPence = 123,
+        friendlyName  = Some("Test Company"),
+        backURL       = "some-back-url"
+      )
 
-      def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"backURL":"some-back-url"}""")
+      def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"some-back-url"}""")
 
     "serialise to json" in {
       Json.toJson(thirdPartyPayRequest(SelfAssessment)) shouldBe jsValue("SelfAssessment")
@@ -43,12 +49,12 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
     }
 
     "asSaSpjRequest correctly creates SpjRequest3psSa" in {
-      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some("some-back-url"), Some("some-back-url"))
+      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"))
       thirdPartyPayRequest(SelfAssessment).asSaSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 
     "asVatSpjRequest correctly creates SpjRequest3psVat" in {
-      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some("some-back-url"), Some("some-back-url"))
+      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"))
       thirdPartyPayRequest(Vat).asVatSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 

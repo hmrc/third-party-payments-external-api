@@ -36,6 +36,7 @@ class StartPaymentControllerSpec extends ItSpec {
     taxRegime     = taxRegime,
     reference     = "1234567895",
     amountInPence = 123,
+    friendlyName  = Some("Test Company"),
     backURL       = "https://www.someBackUrl.com"
   )
 
