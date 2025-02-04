@@ -78,14 +78,26 @@ paths:
       description: |
         After a successful call to the /pay endpoint, the API user receives JSON with a redirection URL. The API user
         then redirects the customer's browser to this URL, starting the payment journey.
+        
+        ### Test data
+        Scenario simulation using Gov-Test-Scenario headers is *only available in the sandbox environment*.
+        As you won't necessarily be able to access the frontend screens to complete the journey, you can use headers in the POST request 
+        to set a journey into a certain state. To achieve this send a Gov-Test-Scenario header with a value matching one of the values below. 
+
+        | Header Value (Gov-Test-Scenario) | Scenario description                                        |
+        | -------------------------------- | ----------------------------------------------------------- |
+        | COMPLETED                        | The payment has completed and the transfer is made.         |
+        | FAILED                           | The payment has failed for one of the following reasons: <br> - The payment was cancelled by the user or timed out at the bank during the payment process. <br> - The bank or building society has rejected the payment. <br> - The payment has failed due to an error. |
+        | IN_PROGRESS                      | The payment is in progress but has not completed or failed. |
+
       security:
         - applicationRestricted: [ ]
       requestBody:
         description: |
           The request body always contains the fields that allow HMRC to identify the liability that is being paid, so 
-          that the funds are not mis-allocated. The required fields are the taxRegime, the paymentReference, the amountInPence and 
-          a journey identifier called the clientJourneyId. The dueDate is an optional field that can allow users to setup a payment for a future date.
-
+          that the funds are not mis-allocated. The required fields are the taxRegime, the paymentReference and amountInPence.
+          The backURL is an optional field containing a url to return the user to after they finish their payment.
+          The friendlyName is an optional field to let the user know where they are being returned to after they finish their payment.
         required: true
         content:
           application/json:
@@ -93,22 +105,16 @@ paths:
               title: Pay request schema
               description: The JSON describing an HMRC third party payment /pay payload.
               type: object
-              required: [ clientJourneyId, taxRegime, paymentReference, amountInPence ]
+              required: [ taxRegime, paymentReference, amountInPence ]
               properties:
-                clientJourneyId:
-                  description: |
-                    The client identifier for this journey. Must be a UUID (version 4, variant 2). This field is used to identify the journey in calls to the /status endpoint.
-                  type: string
-                  format: uuid
-                  example: a218f71d-9bf2-438e-851c-71d50866c2e9
                 taxRegime:
                   type: string
                   description: |
-                    The tax regime under which the liability has arisen. One of a fixed set. Currently supported regimes are: Self Assessment.
-                  enum: [ SelfAssessment ]
+                    The tax regime under which the liability has arisen. One of a fixed set. Currently supported regimes are: Self Assessment and Vat.
+                  enum: [ SelfAssessment, Vat ]
                   example: SelfAssessment
                 paymentReference:
-                  description: The reference identifying the tax liability, penalty or interest payment. For self assessment this is the SA UTR and is 10 digits long.
+                  description: The reference identifying the tax liability. For Self Assessment this is the 10 digit Unique Taxpayer Reference. For VAT this is the 9-digit VAT registration number.
                   type: string
                   example: 1097172564
                 amountInPence:
@@ -117,20 +123,19 @@ paths:
                   minimum: 0
                   exclusiveMinimum: false
                   example: 1234
-                dueDate:
-                  description: The due date of the liability in format YYYY-MM-DD, an optional date in the future. Dates in the future allow users to schedule a future dated payment, which will schedule a payment to be taken at the selected date in the future.
-                  type: string
-                  format: date
-                  example: 2025-01-30
                 backURL:
                   description: If this is present HMRC will offer this as a link to the customer at the end of the journey, this link can allow them to return to their software.
                   type: string
                   format: uri
                   example: "https://some-accounting-software.com/after-pay/a218f71d9bf2438e851c71d50866c2e9"
+                friendlyName:
+                  description: The name of the software that the user started their payment from. If this is present, then we will display a link to help users go back to their software which says ”return to <friendlyName>”
+                  type: string
+                  example: "Accounting Software Company X"
 
       responses:
         201:
-          description: Created. Body contains url to redirect user to.
+          description: Created. Body contains url to redirect user to and a UUID to look up the status of the payment journey with.
           content:
             application/json:
               schema:
@@ -139,8 +144,15 @@ paths:
                   redirectURL:
                     type: string
                     description: The URL to direct the customer browser to in order to initiate the customer payment journey
+                  clientJourneyId:
+                    type: string
+                    format: uuid
+                    description: The client identifier for this journey. This will be a UUID (version 4, variant 2). This field is used to identify the journey in calls to the /status endpoint.
               example:
-                { "redirectURL": "https://tax.gov.uk/payments/start/jhdugiuygdwuygsxajvbh" }
+                {
+                  "redirectURL": "https://tax.gov.uk/payments/start/jhdugiuygdwuygsxajvbh",
+                  "clientJourneyId": "a218f71d-9bf2-438e-851c-71d50866c2e9"
+                }
 
         400:
           description: |
@@ -179,7 +191,6 @@ paths:
         The API user can check the payment status by providing the clientJourneyId used 
         when the payment journey was created.
         The JSON body returned will include the clientJourneyId, the taxRegime, the paymentReference, the amountInPence paid and also the paymentStatus. 
-        *NOTE* the paymentStatus is a fixed enum, with scheduled meaning the payment has not been taken, but has been scheduled to be taken at a future date chosen by the user.
 
       security:
         - applicationRestricted: [ ]
@@ -211,7 +222,7 @@ paths:
                   taxRegime:
                     type: string
                     description: The tax regime under which the liability has arisen. One of a fixed set.
-                    enum: [ SelfAssessment ]
+                    enum: [ SelfAssessment, Vat ]
                     example: "SelfAssessment"
                   paymentReference:
                     type: string
@@ -224,12 +235,8 @@ paths:
                   paymentStatus:
                     description: |
                       The status of the payment within the HMRC system.
-                      "Completed" - The user has completed the HMRC payment journey successfully.  It does not mean that a payment has been made to HMRC.  This is dependent on the number of authorisations a payment needs and how long it takes the user's bank to submit the payment to HMRC.
-                      "Failed" - The user's payment journey has failed.  This can be due to a number of reasons - issues at HMRC or the user's bank e.g. insufficient funds, journey timed out before payment authorised, etc.
-                      "Cancelled" - The payment was cancelled by the user before completion.
-                      "Scheduled" - The user has successfully set up a future dated payment.  The payment will be made on the date selected by the user.  The payment can also be cancelled by the user at their bank before the payment date.
                     type: string
-                    enum: [ Completed, Failed, Cancelled, Scheduled ]
+                    enum: [ Completed, Failed, InProgress ]
                     example: "Completed"
               example:
                 {
