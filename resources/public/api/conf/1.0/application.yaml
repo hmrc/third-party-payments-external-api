@@ -129,7 +129,7 @@ paths:
                   format: uri
                   example: "https://some-accounting-software.com/after-pay/a218f71d9bf2438e851c71d50866c2e9"
                 friendlyName:
-                  description: The name of the software that the user started their payment from. If this is present, then we will display a link to help users go back to their software which says ”return to <friendlyName>”
+                  description: The name of the software that the user started their payment from. If this is present, then we will display a link to help users go back to their software which says "return to &lt;friendlyName&gt;"
                   type: string
                   example: "Accounting Software Company X"
 
