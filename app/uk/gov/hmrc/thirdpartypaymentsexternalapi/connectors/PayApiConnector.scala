@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest, SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat, SpjResponse}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.FriendlyName
 
 import java.net.URL
 import java.util.UUID
@@ -38,13 +39,25 @@ class PayApiConnector @Inject() (
 
   private val startSelfAssessmentJourneyUrl: URL = url"$payApiBaseUrl/third-party-software/self-assessment/journey/start"
 
-  def startSelfAssessmentJourney(spjRequest: SpjRequest3psSa)(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] =
-    startPaymentJourney[SpjRequest3psSa](startSelfAssessmentJourneyUrl, spjRequest)(SpjRequest3psSa.format)
+  def startSelfAssessmentJourney(spjRequest: SpjRequest3psSa)(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] = {
+    if(spjRequest.friendlyName.isDefined) {
+      FriendlyName.isValid(spjRequest.friendlyName.toString)
+      startPaymentJourney[SpjRequest3psSa](startSelfAssessmentJourneyUrl, spjRequest)(SpjRequest3psSa.format)
+    } else {
+      startPaymentJourney[SpjRequest3psSa](startSelfAssessmentJourneyUrl, spjRequest)(SpjRequest3psSa.format)
+    }
+  }
 
   private val startVatJourneyUrl: URL = url"$payApiBaseUrl/third-party-software/vat/journey/start"
 
-  def startVatJourney(spjRequest: SpjRequest3psVat)(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] =
-    startPaymentJourney[SpjRequest3psVat](startVatJourneyUrl, spjRequest)(SpjRequest3psVat.format)
+  def startVatJourney(spjRequest: SpjRequest3psVat)(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] = {
+    if(spjRequest.friendlyName.isDefined) {
+      FriendlyName.isValid(spjRequest.friendlyName.toString)
+      startPaymentJourney[SpjRequest3psVat](startVatJourneyUrl, spjRequest)(SpjRequest3psVat.format)
+    } else {
+      startPaymentJourney[SpjRequest3psVat](startVatJourneyUrl, spjRequest)(SpjRequest3psVat.format)
+    }
+  }
 
   private val startCorporationTaxJourneyUrl: URL = url"$payApiBaseUrl/third-party-software/corporation-tax/journey/start"
 
