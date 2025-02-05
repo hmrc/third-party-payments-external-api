@@ -10,6 +10,7 @@ ThisBuild / scalaVersion := "2.13.12"
 
 lazy val microservice = Project("third-party-payments-external-api", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     scalacOptions ++= ScalaCompilerFlags.scalaCompilerOptions,
