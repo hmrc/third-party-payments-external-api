@@ -36,7 +36,7 @@ class PayApiServiceSpec extends ItSpec {
     reference     = "someReference",
     amountInPence = 123,
     friendlyName  = Some("Test Company"),
-    backURL       = "some-back-url"
+    backURL       = Some("some-back-url")
   )
 
   val testThirdPartyPayResponse: ThirdPartyPayResponse = ThirdPartyPayResponse(

@@ -35,7 +35,7 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
         reference     = "someReference",
         amountInPence = 123,
         friendlyName  = Some("Test Company"),
-        backURL       = "some-back-url"
+        backURL       = Some("some-back-url")
       )
 
       def jsValue(taxRegimeString: String) = Json.parse(s"""{"taxRegime":"$taxRegimeString","reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"some-back-url"}""")
