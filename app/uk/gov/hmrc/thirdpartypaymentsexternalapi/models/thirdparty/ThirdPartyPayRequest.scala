@@ -25,7 +25,7 @@ final case class ThirdPartyPayRequest(
     reference:     String,
     amountInPence: Int,
     friendlyName:  Option[String],
-    backURL:       String
+    backURL:       Option[String]
 //TODO: we should introduce some witness types too, not now though.
 ) {
 
@@ -34,30 +34,30 @@ final case class ThirdPartyPayRequest(
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
     friendlyName    = friendlyName,
-    returnUrl       = Some(backURL),
-    backUrl         = Some(backURL)
+    returnUrl       = backURL,
+    backUrl         = backURL
   )
   def asVatSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psVat = SpjRequest3psVat(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
     friendlyName    = friendlyName,
-    returnUrl       = Some(backURL),
-    backUrl         = Some(backURL)
+    returnUrl       = backURL,
+    backUrl         = backURL
   )
   def asCorporationTaxSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psCorporationTax = SpjRequest3psCorporationTax(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
-    returnUrl       = Some(backURL),
-    backUrl         = Some(backURL)
+    returnUrl       = backURL,
+    backUrl         = backURL
   )
   def asEmployersPayAsYouEarnSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
-    returnUrl       = Some(backURL),
-    backUrl         = Some(backURL)
+    returnUrl       = backURL,
+    backUrl         = backURL
   )
 }
 
