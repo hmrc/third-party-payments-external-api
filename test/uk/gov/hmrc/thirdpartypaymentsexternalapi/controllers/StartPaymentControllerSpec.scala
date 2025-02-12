@@ -17,11 +17,12 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
 
 import play.api.libs.json.Json
+import play.api.mvc.AnyContentAsJson
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
 import play.mvc.Http.Status
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{FriendlyName, RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
@@ -32,19 +33,19 @@ class StartPaymentControllerSpec extends ItSpec {
 
   private val startPaymentController = app.injector.instanceOf[StartPaymentController]
 
-  private def testThirdPartyRequest(taxRegime: TaxRegime): ThirdPartyPayRequest = ThirdPartyPayRequest(
+  private def testThirdPartyRequest(taxRegime: TaxRegime, friendlyName: Option[FriendlyName]): ThirdPartyPayRequest = ThirdPartyPayRequest(
     taxRegime     = taxRegime,
     reference     = "1234567895",
     amountInPence = 123,
-    friendlyName  = Some("Test Company"),
+    friendlyName  = friendlyName,
     backURL       = "https://www.someBackUrl.com"
   )
 
   private val clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
   private val expectedTestThirdPartyPayResponse = ThirdPartyPayResponse(clientJourneyId, RedirectUrl("https://somenext-url.co.uk"))
 
-  private def fakeRequest(taxRegime: TaxRegime): FakeRequest[ThirdPartyPayRequest] =
-    FakeRequest("POST", "/pay").withBody[ThirdPartyPayRequest](testThirdPartyRequest(taxRegime))
+  private def fakeRequest(taxRegime: TaxRegime, friendlyName: Option[FriendlyName]): FakeRequest[AnyContentAsJson] =
+    FakeRequest("POST", "/pay").withJsonBody(Json.toJson(testThirdPartyRequest(taxRegime, friendlyName)))
 
   "POST /pay" - {
 
@@ -52,7 +53,7 @@ class StartPaymentControllerSpec extends ItSpec {
 
       "for Self Assessment" in {
         PayApiStub.stubForStartJourneySelfAssessment()
-        val result = startPaymentController.pay()(fakeRequest(SelfAssessment))
+        val result = startPaymentController.pay()(fakeRequest(SelfAssessment, Some(FriendlyName("Test Company"))))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
@@ -60,7 +61,7 @@ class StartPaymentControllerSpec extends ItSpec {
 
       "for Vat" in {
         PayApiStub.stubForStartJourneyVat()
-        val result = startPaymentController.pay()(fakeRequest(Vat))
+        val result = startPaymentController.pay()(fakeRequest(Vat, Some(FriendlyName("Test Company"))))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         PayApiStub.verifyStartJourneyVat(count = 1)
@@ -68,7 +69,7 @@ class StartPaymentControllerSpec extends ItSpec {
 
       "for Corporation Tax" in {
         PayApiStub.stubForStartJourneyCorporationTax()
-        val result = startPaymentController.pay()(fakeRequest(CorporationTax))
+        val result = startPaymentController.pay()(fakeRequest(CorporationTax, Some(FriendlyName("Test Company"))))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
@@ -76,45 +77,60 @@ class StartPaymentControllerSpec extends ItSpec {
 
       "for Employers Pay As You Earn" in {
         PayApiStub.stubForStartJourneyEmployersPayAsYouEarn()
-        val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn))
+        val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn, Some(FriendlyName("Test Company"))))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
     }
 
-    "return an error when pay-api returns an error" - {
+    "return an InternalServerError response when pay-api returns an error" - {
 
       "for Self Assessment" in {
         PayApiStub.stubForStartJourneySelfAssessment5xx()
-        val result = startPaymentController.pay()(fakeRequest(SelfAssessment))
+        val result = startPaymentController.pay()(fakeRequest(SelfAssessment, Some(FriendlyName("Test Company"))))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        contentAsJson(result) shouldBe Json.parse("""{"error":"Error from upstream"}""")
+        contentAsJson(result) shouldBe Json.parse("""{"error":"Error from upstream."}""")
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
 
       "for Vat" in {
         PayApiStub.stubForStartJourneyVat5xx()
-        val result = startPaymentController.pay()(fakeRequest(Vat))
+        val result = startPaymentController.pay()(fakeRequest(Vat, Some(FriendlyName("Test Company"))))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        contentAsJson(result) shouldBe Json.parse("""{"error":"Error from upstream"}""")
+        contentAsJson(result) shouldBe Json.parse("""{"error":"Error from upstream."}""")
         PayApiStub.verifyStartJourneyVat(count = 1)
       }
 
       "for Corporation Tax" in {
         PayApiStub.stubForStartJourneyCorporationTax5xx()
-        val result = startPaymentController.pay()(fakeRequest(CorporationTax))
+        val result = startPaymentController.pay()(fakeRequest(CorporationTax, Some(FriendlyName("Test Company"))))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        contentAsJson(result) shouldBe Json.parse("""{"error":"Error from upstream"}""")
+        contentAsJson(result) shouldBe Json.parse("""{"error":"Error from upstream."}""")
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
 
       "for Employers Pay As You Earn" in {
         PayApiStub.stubForStartJourneyEmployersPayAsYouEarn5xx()
-        val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn))
+        val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn, Some(FriendlyName("Test Company"))))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-        contentAsJson(result) shouldBe Json.parse("""{"error":"Error from upstream"}""")
+        contentAsJson(result) shouldBe Json.parse("""{"error":"Error from upstream."}""")
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
+      }
+    }
+
+    "return a BadRequest response when friendly name" - {
+      "is too long (more than 40 characters)" in {
+        val stringMoreThan40Characters = "IamMoreThan40Characters123456789123456789"
+        val result = startPaymentController.pay()(fakeRequest(SelfAssessment, Some(FriendlyName(stringMoreThan40Characters))))
+        status(result) shouldBe Status.BAD_REQUEST
+        contentAsJson(result) shouldBe Json.parse("""{"error":"Friendly name too long."}""")
+      }
+      "contains invalid characters " in {
+        val stringContainingInvalidCharacter = "IhaveinvalidChar%"
+        val result = startPaymentController.pay()(fakeRequest(SelfAssessment, Some(FriendlyName(stringContainingInvalidCharacter))))
+        status(result) shouldBe Status.BAD_REQUEST
+        contentAsJson(result) shouldBe Json.parse("""{"error":"Friendly name contains invalid character."}""")
       }
     }
 

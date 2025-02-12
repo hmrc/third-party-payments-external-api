@@ -19,7 +19,7 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{FriendlyName, RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 
@@ -35,7 +35,7 @@ class PayApiServiceSpec extends ItSpec {
     taxRegime     = taxRegime,
     reference     = "someReference",
     amountInPence = 123,
-    friendlyName  = Some("Test Company"),
+    friendlyName  = Some(FriendlyName("Test Company")),
     backURL       = "some-back-url"
   )
 

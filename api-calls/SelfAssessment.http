@@ -10,7 +10,6 @@ Content-Type: Application/Json
   "taxRegime": "SelfAssessment",
   "reference": "1234567891",
   "amountInPence": 123,
-  "friendlyName" : "Test Company",
-  "backURL": "https://www.someBackUrl.com",
-  "dueDate": "2025-01-31"
+  "friendlyName" : "IamMoreThan40Characters123456789123456789",
+  "backURL": "https://www.someBackUrl.com"
 }

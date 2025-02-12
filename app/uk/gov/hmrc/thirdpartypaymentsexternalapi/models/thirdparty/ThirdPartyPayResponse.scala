@@ -32,6 +32,15 @@ sealed trait ThirdPartyResponseError {
 
 object ThirdPartyResponseErrors {
   case object UpstreamError extends ThirdPartyResponseError {
-    val errorMessage = "Error from upstream"
+    val errorMessage = "Error from upstream."
+  }
+  case object FriendlyNameTooLongError extends ThirdPartyResponseError {
+    val errorMessage = "Friendly name too long."
+  }
+  case object FriendlyNameInvalidCharacterError extends ThirdPartyResponseError {
+    val errorMessage = "Friendly name contains invalid character."
+  }
+  case object CatchallError extends ThirdPartyResponseError {
+    val errorMessage: String = "An unexpected error occurred."
   }
 }

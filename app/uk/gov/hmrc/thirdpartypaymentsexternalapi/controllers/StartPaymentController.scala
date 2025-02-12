@@ -16,30 +16,61 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
 
-import play.api.libs.json.Json
+import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.PayApiService
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class StartPaymentController @Inject() (cc: ControllerComponents, payApiService: PayApiService)(implicit executionContext: ExecutionContext)
   extends BackendController(cc) {
 
-  def pay(): Action[ThirdPartyPayRequest] = Action.async(parse.json[ThirdPartyPayRequest]) { implicit request: Request[ThirdPartyPayRequest] =>
-    payApiService
-      .startPaymentJourney(request.body)
-      .map {
-        case Left(error)                  => thirdPartyResponseErrorToResult(error)
-        case Right(thirdPartyPayResponse) => Created(Json.toJson(thirdPartyPayResponse))
-      }
+  def pay(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    val jsonBody: Either[String, ThirdPartyPayRequest] =
+      request.body
+        .asJson
+        .fold[Either[String, ThirdPartyPayRequest]](Left("Not a valid json body")) {
+          _.validate[ThirdPartyPayRequest] match {
+            case JsSuccess(value, _) => Right(value)
+            case JsError(errors: collection.Seq[(JsPath, collection.Seq[JsonValidationError])]) =>
+              errors.collectFirst {
+                case j: (JsPath, collection.Seq[JsonValidationError]) =>
+                  println("jspath: " + j._1.toString())
+                  println("validationErrors: " + j._2.toString())
+                  Left(j._2.headOption.map(_.message).getOrElse("Unexpected error occurred"))
+              }.getOrElse(Left("Unexpected error occurred"))
+          }
+        }
+
+    jsonBody match {
+      case Left(value) => Future.successful(BadRequest(Json.obj("error" -> value)))
+      case Right(value) =>
+        payApiService
+          .startPaymentJourney(value)
+          .map {
+            case Left(error)                  => thirdPartyResponseErrorToResult(error)
+            case Right(thirdPartyPayResponse) => Created(Json.toJson(thirdPartyPayResponse))
+          }
+    }
   }
 
   //this is used to hide the error returned from pay-api, which includes info about the url etc.
   private val thirdPartyResponseErrorToResult: ThirdPartyResponseError => Result = {
-    case e @ ThirdPartyResponseErrors.UpstreamError => InternalServerError(Json.obj("error" -> e.errorMessage))
+    case e @ ThirdPartyResponseErrors.UpstreamError                     => InternalServerError(createErrorResponse(e))
+    case e @ ThirdPartyResponseErrors.CatchallError                     => InternalServerError(createErrorResponse(e))
+    case e @ ThirdPartyResponseErrors.FriendlyNameTooLongError          => BadRequest(createErrorResponse(e))
+    case e @ ThirdPartyResponseErrors.FriendlyNameInvalidCharacterError => BadRequest(createErrorResponse(e))
   }
+
+  private val createErrorResponse: ThirdPartyResponseError => JsObject = e => Json.obj("error" -> e.errorMessage)
+
+  def errorMessageToSOmethingUseful(errorCode: String): String = errorCode match {
+    case "error.pattern" => "Contains invalid character"
+    case _               => "some other error not implemented yet"
+  }
+
 }
