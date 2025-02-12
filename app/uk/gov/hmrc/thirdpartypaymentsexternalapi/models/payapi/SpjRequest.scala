@@ -17,7 +17,7 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, FriendlyName}
 
 sealed trait SpjRequest
 
@@ -25,7 +25,7 @@ final case class SpjRequest3psSa(
     utr:             String,
     amountInPence:   Int,
     clientJourneyId: ClientJourneyId,
-    friendlyName:    Option[String],
+    friendlyName:    Option[FriendlyName],
     returnUrl:       Option[String],
     backUrl:         Option[String]
 ) extends SpjRequest
@@ -39,7 +39,7 @@ final case class SpjRequest3psVat(
     vrn:             String,
     amountInPence:   Int,
     clientJourneyId: ClientJourneyId,
-    friendlyName:    Option[String],
+    friendlyName:    Option[FriendlyName],
     returnUrl:       Option[String],
     backUrl:         Option[String]
 ) extends SpjRequest

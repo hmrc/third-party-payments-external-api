@@ -22,8 +22,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
 import play.mvc.Http.Status
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{FriendlyName, RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, FriendlyName, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
 
@@ -38,7 +38,7 @@ class StartPaymentControllerSpec extends ItSpec {
     reference     = "1234567895",
     amountInPence = 123,
     friendlyName  = friendlyName,
-    backURL       = "https://www.someBackUrl.com"
+    backURL       = Some("https://www.someBackUrl.com")
   )
 
   private val clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
@@ -84,7 +84,7 @@ class StartPaymentControllerSpec extends ItSpec {
       }
     }
 
-    "return an InternalServerError response when pay-api returns an error" - {
+    "return an InternalServerError with UpstreamError message when pay-api returns an error" - {
 
       "for Self Assessment" in {
         PayApiStub.stubForStartJourneySelfAssessment5xx()
@@ -119,15 +119,29 @@ class StartPaymentControllerSpec extends ItSpec {
       }
     }
 
-    "return a BadRequest response when friendly name" - {
+    "return a BadRequest with NonJsonBodyError message when body is not valid json" in {
+      val result = startPaymentController.pay()(FakeRequest().withBody("somestringthatisn'tjson"))
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsJson(result) shouldBe Json.parse("""{"error":"Request body was not json"}""")
+    }
+
+    "return an InternalServerError with UnexpectedError message when parsing results in JsError and key is not recognised" in {
+      val result = startPaymentController.pay()(FakeRequest().withJsonBody(Json.parse("""{"IamValidJson":"butnotmatchingthemodel"}""")))
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      contentAsJson(result) shouldBe Json.parse("""{"error":"An unexpected error occurred."}""")
+    }
+
+    "return a BadRequest with relevant error message when friendly name" - {
+
       "is too long (more than 40 characters)" in {
         val stringMoreThan40Characters = "IamMoreThan40Characters123456789123456789"
         val result = startPaymentController.pay()(fakeRequest(SelfAssessment, Some(FriendlyName(stringMoreThan40Characters))))
         status(result) shouldBe Status.BAD_REQUEST
         contentAsJson(result) shouldBe Json.parse("""{"error":"Friendly name too long."}""")
       }
+
       "contains invalid characters " in {
-        val stringContainingInvalidCharacter = "IhaveinvalidChar%"
+        val stringContainingInvalidCharacter = "invalidcharinthisstring%"
         val result = startPaymentController.pay()(fakeRequest(SelfAssessment, Some(FriendlyName(stringContainingInvalidCharacter))))
         status(result) shouldBe Status.BAD_REQUEST
         contentAsJson(result) shouldBe Json.parse("""{"error":"Friendly name contains invalid character."}""")

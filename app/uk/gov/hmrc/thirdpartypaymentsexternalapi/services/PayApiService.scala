@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
+import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors.PayApiConnector
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
@@ -46,6 +47,9 @@ class PayApiService @Inject() (
       .map(spjResponse => Right(ThirdPartyPayResponse(clientJourneyId = clientJourneyId, redirectURL = RedirectUrl(spjResponse.nextUrl.value))))
       .recover {
         case _: UpstreamErrorResponse => Left(ThirdPartyResponseErrors.UpstreamError)
+        case e =>
+          Logger(this.getClass).error(s"Unexpected error occurred when trying to start spj: ${e.getMessage}")
+          Left(ThirdPartyResponseErrors.UnexpectedError)
       }
   }
 

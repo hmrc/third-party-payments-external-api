@@ -54,6 +54,13 @@ object PayApiStub {
     )
   )
 
+  def stubForStartJourneySelfAssessment3xx(): StubMapping = stubFor(
+    post(urlPathEqualTo(selfAssessmentPath)).willReturn(
+      aResponse()
+        .withStatus(Status.MOVED_PERMANENTLY)
+    )
+  )
+
   def verifyStartJourneySelfAssessment(count: Int): Unit = verifyPost(count, selfAssessmentPath)
 
   def stubForStartJourneyVat(): StubMapping = stubFor(
