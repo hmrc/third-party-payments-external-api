@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsString, JsSuccess, Json, JsonValidationError}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.ThirdPartyPayRequest
@@ -34,7 +34,7 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
         taxRegime     = taxRegime,
         reference     = "someReference",
         amountInPence = 123,
-        friendlyName  = Some("Test Company"),
+        friendlyName  = Some(FriendlyName("Test Company")),
         backURL       = Some("some-back-url")
       )
 
@@ -48,13 +48,31 @@ class ThirdPartyPayRequestSpec extends UnitSpec {
       Json.fromJson[ThirdPartyPayRequest](jsValue("SelfAssessment")).asEither shouldBe Right(thirdPartyPayRequest(SelfAssessment))
     }
 
+    "friendlyName.reads" - {
+
+      "allow for special characters from a list we found on companies house website" in {
+        val stringWithAllowedCharacters = "&@£$€¥#.,:; leftofthisisaspace0123456789"
+        FriendlyName.reads.reads(JsString(stringWithAllowedCharacters)) shouldBe JsSuccess(FriendlyName(stringWithAllowedCharacters))
+      }
+
+      "cause a JsError when friendly name string contains a special character not in the allowed list" in {
+        val stringContainingInvalidCharacter = "invalidcharinthisstring%"
+        FriendlyName.reads.reads(JsString(stringContainingInvalidCharacter)) shouldBe JsError(JsonValidationError(List("friendlyName.error.invalidCharacters")))
+      }
+
+      "cause a JsError when friendly name string is too long (more than 40 characters)" in {
+        val stringMoreThan40Characters = "IamMoreThan40Characters123456789123456789"
+        FriendlyName.reads.reads(JsString(stringMoreThan40Characters)) shouldBe JsError(JsonValidationError(List("friendlyName.error.maxLength")))
+      }
+    }
+
     "asSaSpjRequest correctly creates SpjRequest3psSa" in {
-      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"))
+      val spjRequest = SpjRequest3psSa("someReference", 123, testClientJourneyId, Some(FriendlyName("Test Company")), Some("some-back-url"), Some("some-back-url"))
       thirdPartyPayRequest(SelfAssessment).asSaSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 
     "asVatSpjRequest correctly creates SpjRequest3psVat" in {
-      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some("Test Company"), Some("some-back-url"), Some("some-back-url"))
+      val spjRequest = SpjRequest3psVat("someReference", 123, testClientJourneyId, Some(FriendlyName("Test Company")), Some("some-back-url"), Some("some-back-url"))
       thirdPartyPayRequest(Vat).asVatSpjRequest(testClientJourneyId) shouldBe spjRequest
     }
 

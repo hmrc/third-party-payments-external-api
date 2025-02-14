@@ -17,7 +17,7 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, FriendlyName}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat, SpjResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
@@ -30,7 +30,7 @@ class PayApiConnectorSpec extends ItSpec {
 
   val payApiConnector: PayApiConnector = app.injector.instanceOf[PayApiConnector]
   val testClientJourneyId: ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
-  val testFriendlyName: String = "Test Company"
+  val testFriendlyName: FriendlyName = FriendlyName("Test Company")
 
   "payApiConnector" - {
 

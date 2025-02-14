@@ -17,7 +17,7 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, FriendlyName, TaxRegime}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
@@ -35,7 +35,7 @@ class PayApiServiceSpec extends ItSpec {
     taxRegime     = taxRegime,
     reference     = "someReference",
     amountInPence = 123,
-    friendlyName  = Some("Test Company"),
+    friendlyName  = Some(FriendlyName("Test Company")),
     backURL       = Some("some-back-url")
   )
 
@@ -79,7 +79,7 @@ class PayApiServiceSpec extends ItSpec {
         }
       }
 
-      "return a Left[UpstreamError] when pay-api call fails" - {
+      "return a Left[UpstreamError] when pay-api call fails due to legitimate upstream error (4xx or 5xx)" - {
         "for Self Assessment" in {
           PayApiStub.stubForStartJourneySelfAssessment5xx()
           val result = payApiService.startPaymentJourney(thirdPartyPayRequest(SelfAssessment))
@@ -107,6 +107,13 @@ class PayApiServiceSpec extends ItSpec {
           result.futureValue shouldBe Left(ThirdPartyResponseErrors.UpstreamError)
           PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
         }
+      }
+
+      "return a Left[UnexpectedError] when pay-api call fails due to some error that is not 4xx or 5xx" in {
+        PayApiStub.stubForStartJourneySelfAssessment3xx()
+        val result = payApiService.startPaymentJourney(thirdPartyPayRequest(SelfAssessment))
+        result.futureValue shouldBe Left(ThirdPartyResponseErrors.UnexpectedError)
+        PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
     }
   }

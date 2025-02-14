@@ -30,7 +30,7 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psSa" - {
 
-      val spjRequest = SpjRequest3psSa("1234567895", 123, testClientJourneyId, Some("Test Company"), Some("someurl"), Some("somurl"))
+      val spjRequest = SpjRequest3psSa("1234567895", 123, testClientJourneyId, Some(FriendlyName("Test Company")), Some("someurl"), Some("somurl"))
       val jsValue = Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
 
       "serialise to json with optional due date" in {
@@ -48,7 +48,7 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psVat" - {
 
-      val spjRequest = SpjRequest3psVat("1234567895", 123, testClientJourneyId, Some("Test Company"), Some("someurl"), Some("somurl"))
+      val spjRequest = SpjRequest3psVat("1234567895", 123, testClientJourneyId, Some(FriendlyName("Test Company")), Some("someurl"), Some("somurl"))
       val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"someurl","backUrl":"somurl"}""")
 
       "serialise to json with optional due date" in {

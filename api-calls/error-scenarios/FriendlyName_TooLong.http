@@ -1,4 +1,4 @@
-### Spj3psSa
+### Friendly name field too long, causes bespoke error message
 
 POST http://localhost:10156/pay
 Accept: */*
@@ -9,6 +9,5 @@ Content-Type: Application/Json
   "taxRegime": "SelfAssessment",
   "reference": "1234567891",
   "amountInPence": 123,
-  "friendlyName": "Test Company",
-  "backURL": "https://www.someBackUrl.com"
+  "friendlyName" : "IamMoreThan40Characters123456789123456789"
 }

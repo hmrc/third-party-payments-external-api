@@ -1,4 +1,3 @@
-
 ### Spj3psVat
 
 POST http://localhost:10156/pay
@@ -10,7 +9,7 @@ Content-Type: Application/Json
   "taxRegime": "Vat",
   "reference": "101747645",
   "amountInPence": 123,
-  "friendlyName" : "Test Company",
+  "friendlyName": "Test Company",
   "backURL": "https://www.someBackUrl.com",
   "dueDate": "2025-04-30"
 }
