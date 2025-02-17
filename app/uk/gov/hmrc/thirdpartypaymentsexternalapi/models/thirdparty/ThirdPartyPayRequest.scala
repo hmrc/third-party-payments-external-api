@@ -23,7 +23,7 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, Friend
 final case class ThirdPartyPayRequest(
     taxRegime:     TaxRegime,
     reference:     String,
-    amountInPence: Int,
+    amountInPence: Long,
     friendlyName:  Option[FriendlyName],
     backURL:       Option[String]
 ) {
