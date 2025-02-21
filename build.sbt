@@ -24,10 +24,13 @@ lazy val microservice = Project("third-party-payments-external-api", file("."))
   .settings(CodeCoverageSettings.settings *)
   .settings(SbtUpdatesSettings.sbtUpdatesSettings *)
   .settings(ScalariformSettings.scalariformSettings *)
-  .settings(WartRemoverSettings.wartRemoverSettings: _*)
+  .settings(WartRemoverSettings.wartRemoverSettings *)
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Compile / scalacOptions -= "utf8"
+  )
+  .settings(
+    routesImport := Seq("uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId")
   )
 
 lazy val it = project

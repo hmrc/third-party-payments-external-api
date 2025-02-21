@@ -23,7 +23,7 @@ sealed trait SpjRequest
 
 final case class SpjRequest3psSa(
     utr:             String,
-    amountInPence:   Int,
+    amountInPence:   Long,
     clientJourneyId: ClientJourneyId,
     friendlyName:    Option[FriendlyName],
     returnUrl:       Option[String],
@@ -37,7 +37,7 @@ object SpjRequest3psSa {
 
 final case class SpjRequest3psVat(
     vrn:             String,
-    amountInPence:   Int,
+    amountInPence:   Long,
     clientJourneyId: ClientJourneyId,
     friendlyName:    Option[FriendlyName],
     returnUrl:       Option[String],
@@ -52,7 +52,7 @@ object SpjRequest3psVat {
 //todo jake update when we do that ticket.
 final case class SpjRequest3psCorporationTax(
     vrn:             String,
-    amountInPence:   Int,
+    amountInPence:   Long,
     clientJourneyId: ClientJourneyId,
     returnUrl:       Option[String],
     backUrl:         Option[String]
@@ -66,7 +66,7 @@ object SpjRequest3psCorporationTax {
 //todo jake update when we do that ticket.
 final case class SpjRequest3psEmployersPayAsYouEarn(
     vrn:             String,
-    amountInPence:   Int,
+    amountInPence:   Long,
     clientJourneyId: ClientJourneyId,
     returnUrl:       Option[String],
     backUrl:         Option[String]

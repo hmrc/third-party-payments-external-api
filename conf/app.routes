@@ -1,3 +1,5 @@
 # microservice specific routes
 
 POST       /pay                     uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers.StartPaymentController.pay()
+
+GET        /status                  uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers.FindPaymentController.status(clientJourneyId: ClientJourneyId)

@@ -45,7 +45,8 @@ trait ItSpec extends AnyFreeSpecLike
   protected lazy val configMap: Map[String, Any] = Map[String, Any](
     "auditing.enabled" -> false,
     "auditing.traceRequests" -> false,
-    "microservice.services.pay-api.port" -> self.wireMockPort
+    "microservice.services.pay-api.port" -> self.wireMockPort,
+    "microservice.services.open-banking.port" -> self.wireMockPort
   )
 
   lazy val overridesModule: AbstractModule = new AbstractModule {
