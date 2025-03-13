@@ -1,0 +1,12 @@
+### Tax regime invalid, causes bespoke error message
+
+POST http://localhost:10156/pay
+Accept: */*
+Cache-Control: no-cache
+Content-Type: Application/Json
+
+{
+  "taxRegime": "SomeRandomRegime",
+  "reference": "1234567895",
+  "amountInPence": 1
+}

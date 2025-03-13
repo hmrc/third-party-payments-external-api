@@ -1,0 +1,3 @@
+### find the status of a payment
+
+GET http://localhost:10156/status?clientJourneyId=d6612aa2-dee4-4e27-92d4-16c219982fe5

@@ -84,7 +84,7 @@ To view documentation locally, ensure the Individual Losses API is running, and 
 Then go to http://localhost:9680/api-documentation/docs/openapi/preview and use the appropriate port and version:
 
 ```
-http://localhost:10156/api/conf/6.0/application.yaml
+http://localhost:10156/api/conf/1.0/application.yaml
 ```
 
 ## API Reference / Documentation

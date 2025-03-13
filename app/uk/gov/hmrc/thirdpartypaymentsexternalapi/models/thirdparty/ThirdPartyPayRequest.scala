@@ -18,14 +18,14 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, FriendlyName, TaxRegime}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, URL, ClientJourneyId, FriendlyName, Reference, TaxRegime}
 
 final case class ThirdPartyPayRequest(
     taxRegime:     TaxRegime,
-    reference:     String,
-    amountInPence: Long,
+    reference:     Reference,
+    amountInPence: AmountInPence,
     friendlyName:  Option[FriendlyName],
-    backURL:       Option[String]
+    backURL:       Option[URL]
 ) {
 
   def asSaSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psSa = SpjRequest3psSa(
@@ -48,6 +48,7 @@ final case class ThirdPartyPayRequest(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
+    friendlyName    = friendlyName,
     returnUrl       = backURL,
     backUrl         = backURL
   )
@@ -55,6 +56,7 @@ final case class ThirdPartyPayRequest(
     vrn             = reference,
     amountInPence   = amountInPence,
     clientJourneyId = clientJourneyId,
+    friendlyName    = friendlyName,
     returnUrl       = backURL,
     backUrl         = backURL
   )

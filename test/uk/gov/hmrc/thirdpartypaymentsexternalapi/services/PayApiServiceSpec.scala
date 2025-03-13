@@ -17,7 +17,7 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, FriendlyName, TaxRegime}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, ClientJourneyId, FriendlyName, Reference, TaxRegime, URL}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
@@ -33,10 +33,10 @@ class PayApiServiceSpec extends ItSpec {
 
   def thirdPartyPayRequest(taxRegime: TaxRegime): ThirdPartyPayRequest = ThirdPartyPayRequest(
     taxRegime     = taxRegime,
-    reference     = "someReference",
-    amountInPence = 123,
+    reference     = Reference("someReference"),
+    amountInPence = AmountInPence(123),
     friendlyName  = Some(FriendlyName("Test Company")),
-    backURL       = Some("some-back-url")
+    backURL       = Some(URL("https://valid-url.com"))
   )
 
   val testThirdPartyPayResponse: ThirdPartyPayResponse = ThirdPartyPayResponse(
@@ -112,7 +112,7 @@ class PayApiServiceSpec extends ItSpec {
       "return a Left[UnexpectedError] when pay-api call fails due to some error that is not 4xx or 5xx" in {
         PayApiStub.stubForStartJourneySelfAssessment3xx()
         val result = payApiService.startPaymentJourney(thirdPartyPayRequest(SelfAssessment))
-        result.futureValue shouldBe Left(ThirdPartyResponseErrors.UnexpectedError)
+        result.futureValue shouldBe Left(ThirdPartyResponseErrors.UnexpectedError("error when trying to start a journey upstream."))
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
     }

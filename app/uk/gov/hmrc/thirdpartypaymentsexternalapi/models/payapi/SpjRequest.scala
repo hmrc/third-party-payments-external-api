@@ -17,17 +17,17 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, FriendlyName}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, ClientJourneyId, FriendlyName, Reference, URL}
 
 sealed trait SpjRequest
 
 final case class SpjRequest3psSa(
-    utr:             String,
-    amountInPence:   Long,
+    utr:             Reference,
+    amountInPence:   AmountInPence,
     clientJourneyId: ClientJourneyId,
     friendlyName:    Option[FriendlyName],
-    returnUrl:       Option[String],
-    backUrl:         Option[String]
+    returnUrl:       Option[URL],
+    backUrl:         Option[URL]
 ) extends SpjRequest
 
 object SpjRequest3psSa {
@@ -36,12 +36,12 @@ object SpjRequest3psSa {
 }
 
 final case class SpjRequest3psVat(
-    vrn:             String,
-    amountInPence:   Long,
+    vrn:             Reference,
+    amountInPence:   AmountInPence,
     clientJourneyId: ClientJourneyId,
     friendlyName:    Option[FriendlyName],
-    returnUrl:       Option[String],
-    backUrl:         Option[String]
+    returnUrl:       Option[URL],
+    backUrl:         Option[URL]
 ) extends SpjRequest
 
 object SpjRequest3psVat {
@@ -51,11 +51,12 @@ object SpjRequest3psVat {
 
 //todo jake update when we do that ticket.
 final case class SpjRequest3psCorporationTax(
-    vrn:             String,
-    amountInPence:   Long,
+    vrn:             Reference,
+    amountInPence:   AmountInPence,
     clientJourneyId: ClientJourneyId,
-    returnUrl:       Option[String],
-    backUrl:         Option[String]
+    friendlyName:    Option[FriendlyName],
+    returnUrl:       Option[URL],
+    backUrl:         Option[URL]
 ) extends SpjRequest
 
 object SpjRequest3psCorporationTax {
@@ -65,11 +66,12 @@ object SpjRequest3psCorporationTax {
 
 //todo jake update when we do that ticket.
 final case class SpjRequest3psEmployersPayAsYouEarn(
-    vrn:             String,
-    amountInPence:   Long,
+    vrn:             Reference,
+    amountInPence:   AmountInPence,
     clientJourneyId: ClientJourneyId,
-    returnUrl:       Option[String],
-    backUrl:         Option[String]
+    friendlyName:    Option[FriendlyName],
+    returnUrl:       Option[URL],
+    backUrl:         Option[URL]
 ) extends SpjRequest
 
 object SpjRequest3psEmployersPayAsYouEarn {

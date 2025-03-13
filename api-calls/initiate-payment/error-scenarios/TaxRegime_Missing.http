@@ -1,0 +1,11 @@
+### Tax regime missing, causes bespoke error message
+
+POST http://localhost:10156/pay
+Accept: */*
+Cache-Control: no-cache
+Content-Type: Application/Json
+
+{
+  "reference": "1234567895",
+  "amountInPence": 1
+}
