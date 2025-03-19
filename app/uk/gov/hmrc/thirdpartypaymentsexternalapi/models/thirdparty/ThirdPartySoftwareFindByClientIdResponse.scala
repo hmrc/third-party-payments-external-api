@@ -21,7 +21,6 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 
 final case class ThirdPartySoftwareFindByClientIdResponse(
     clientJourneyId:      ClientJourneyId,
-    paymentReference:     String,
     taxRegime:            String,
     amountInPence:        Long,
     paymentJourneyStatus: String

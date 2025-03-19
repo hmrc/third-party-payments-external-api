@@ -45,7 +45,6 @@ class FindPaymentControllerSpec extends ItSpec {
       contentAsJson(result) shouldBe Json.parse(
         """{
           |  "clientJourneyId" : "aef0f31b-3c0f-454b-9d1f-07d549987a96",
-          |  "paymentReference" : "paymentRef",
           |  "taxRegime" : "TaxRegime",
           |  "amountInPence" : 1234,
           |  "paymentJourneyStatus" : "InProgress"
