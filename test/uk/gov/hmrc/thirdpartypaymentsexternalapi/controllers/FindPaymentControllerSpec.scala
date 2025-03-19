@@ -47,7 +47,7 @@ class FindPaymentControllerSpec extends ItSpec {
           |  "clientJourneyId" : "aef0f31b-3c0f-454b-9d1f-07d549987a96",
           |  "taxRegime" : "TaxRegime",
           |  "amountInPence" : 1234,
-          |  "paymentJourneyStatus" : "InProgress"
+          |  "paymentStatus" : "InProgress"
           |}""".stripMargin
       )
 

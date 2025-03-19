@@ -35,7 +35,7 @@ object OpenBankingStub {
                     |  "paymentReference" : "paymentRef",
                     |  "taxRegime" : "taxRegime",
                     |  "amountInPence" : 1234,
-                    |  "paymentJourneyStatus" : "InProgress"
+                    |  "paymentStatus" : "InProgress"
                     |}""".stripMargin)
     )
   )
