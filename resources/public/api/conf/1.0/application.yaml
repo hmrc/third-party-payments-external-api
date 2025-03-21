@@ -228,10 +228,6 @@ paths:
                     description: The tax regime under which the liability has arisen. One of a fixed set.
                     enum: [ SelfAssessment, Vat ]
                     example: "SelfAssessment"
-                  paymentReference:
-                    type: string
-                    description: The reference identifying the tax liability.
-                    example: "1097172564"
                   amountInPence:
                     description: Represents the amount actually paid, in pence.
                     type: integer
@@ -246,7 +242,6 @@ paths:
                 {
                   "clientJourneyId": "a218f71d-9bf2-438e-851c-71d50866c2e9",
                   "taxRegime": "SelfAssessment",
-                  "paymentReference": "1097172564",
                   "amountInPence": 1453,
                   "paymentStatus": "Completed"
                 }

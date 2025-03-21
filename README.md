@@ -48,7 +48,7 @@ Example response:
 ```json
 {
   "clientJourneyId": "aef0f31b-3c0f-454b-9d1f-07d549987a96",
-  "paymentJourneyStatus": "InProgress"
+  "paymentStatus": "InProgress"
 }
 ```
 
