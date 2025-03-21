@@ -1,0 +1,12 @@
+### Invalid tax regime and negative amount in pence, causes bespoke multiple error messages
+
+POST http://localhost:10156/pay
+Accept: */*
+Cache-Control: no-cache
+Content-Type: Application/Json
+
+{
+  "taxRegime": "MadeUpTaxRegime",
+  "reference": "1234567895",
+  "amountInPence": -1
+}

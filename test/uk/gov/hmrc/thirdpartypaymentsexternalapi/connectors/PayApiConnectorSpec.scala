@@ -17,7 +17,7 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors
 
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, FriendlyName}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, ClientJourneyId, FriendlyName, Reference}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat, SpjResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.PayApiStub
@@ -29,6 +29,8 @@ import scala.concurrent.Future
 class PayApiConnectorSpec extends ItSpec {
 
   val payApiConnector: PayApiConnector = app.injector.instanceOf[PayApiConnector]
+  val testReference: Reference = Reference("1234567895")
+  val testAmountInPence: AmountInPence = AmountInPence(123)
   val testClientJourneyId: ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
   val testFriendlyName: FriendlyName = FriendlyName("Test Company")
 
@@ -36,7 +38,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startSelfAssessmentJourney" - {
 
-      val testSpjRequest3psSa: SpjRequest3psSa = SpjRequest3psSa("1234567895", 123, testClientJourneyId, Some(testFriendlyName), None, None)
+      val testSpjRequest3psSa: SpjRequest3psSa = SpjRequest3psSa(testReference, testAmountInPence, testClientJourneyId, Some(testFriendlyName), None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneySelfAssessment()
@@ -56,7 +58,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startVatJourney" - {
 
-      val testSpjRequest3psVat: SpjRequest3psVat = SpjRequest3psVat("1234567895", 123, testClientJourneyId, Some(testFriendlyName), None, None)
+      val testSpjRequest3psVat: SpjRequest3psVat = SpjRequest3psVat(testReference, testAmountInPence, testClientJourneyId, Some(testFriendlyName), None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyVat()
@@ -76,7 +78,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startCorporationTaxJourney" - {
 
-      val testSpjRequest3psCorporationTax: SpjRequest3psCorporationTax = SpjRequest3psCorporationTax("1234567895", 123, testClientJourneyId, None, None)
+      val testSpjRequest3psCorporationTax: SpjRequest3psCorporationTax = SpjRequest3psCorporationTax(testReference, testAmountInPence, testClientJourneyId, Some(testFriendlyName), None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyCorporationTax()
@@ -96,7 +98,7 @@ class PayApiConnectorSpec extends ItSpec {
 
     "startEmployersPayAsYouEarnJourney" - {
 
-      val testSpjRequest3psEmployersPayAsYouEarn: SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn("1234567895", 123, testClientJourneyId, None, None)
+      val testSpjRequest3psEmployersPayAsYouEarn: SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn(testReference, testAmountInPence, testClientJourneyId, Some(testFriendlyName), None, None)
 
       "should return an SpjResponse given pay-api call succeeds" in {
         PayApiStub.stubForStartJourneyEmployersPayAsYouEarn()

@@ -19,60 +19,50 @@ import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.PayApiService
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.{PayApiService, ValidationService}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class StartPaymentController @Inject() (cc: ControllerComponents, payApiService: PayApiService)(implicit executionContext: ExecutionContext)
+class StartPaymentController @Inject() (cc: ControllerComponents, payApiService: PayApiService, validationService: ValidationService)(implicit executionContext: ExecutionContext)
   extends BackendController(cc) {
 
   def pay(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
 
-    val jsonBody: Either[ThirdPartyResponseError, ThirdPartyPayRequest] =
+    val requestOrErrors: Either[Seq[ThirdPartyResponseError], ThirdPartyPayRequest] =
       request.body.asJson
-        .fold[Either[ThirdPartyResponseError, ThirdPartyPayRequest]](Left(ThirdPartyResponseErrors.NonJsonBodyError)) {
-          _.validate[ThirdPartyPayRequest] match {
-            case JsSuccess(value, _) => Right(value)
-            case e @ JsError(_: collection.Seq[(JsPath, collection.Seq[JsonValidationError])]) =>
-              Left(
-                jsErrorToMessages(e)
-                  .headOption
-                  .fold[ThirdPartyResponseError](ThirdPartyResponseErrors.UnexpectedError)(errorMessageKeyToThirdPartyResponseErrors)
-              )
-          }
-        }
+        .fold[Either[Seq[ThirdPartyResponseError], ThirdPartyPayRequest]](
+          ifEmpty = Left(Seq(ThirdPartyResponseErrors.NonJsonBodyError))
+        )(
+            f = validationService.validateThirdPartyRequest
+          )
 
-    jsonBody match {
-      case Left(value) => Future.successful(thirdPartyResponseErrorToResult(value))
+    requestOrErrors match {
+      case Left(value) =>
+        Future.successful(thirdPartyResponseErrorToResult(value))
       case Right(value) =>
         payApiService
           .startPaymentJourney(value)
           .map {
-            case Left(error)                  => thirdPartyResponseErrorToResult(error)
+            case Left(error)                  => thirdPartyResponseErrorToResult(Seq(error))
             case Right(thirdPartyPayResponse) => Created(Json.toJson(thirdPartyPayResponse))
           }
     }
   }
 
-  //this is used to hide the error returned from pay-api, which includes info about the url etc.
-  private val thirdPartyResponseErrorToResult: ThirdPartyResponseError => Result = {
-    case e @ ThirdPartyResponseErrors.UnexpectedError                   => InternalServerError(createErrorResponse(e))
-    case e @ ThirdPartyResponseErrors.UpstreamError                     => InternalServerError(createErrorResponse(e))
-    case e @ ThirdPartyResponseErrors.NonJsonBodyError                  => BadRequest(createErrorResponse(e))
-    case e @ ThirdPartyResponseErrors.FriendlyNameTooLongError          => BadRequest(createErrorResponse(e))
-    case e @ ThirdPartyResponseErrors.FriendlyNameInvalidCharacterError => BadRequest(createErrorResponse(e))
+  //Just return an Internal server error if any of the errors are related to that, else BadRequest with list of errors
+  def thirdPartyResponseErrorToResult(errors: Seq[ThirdPartyResponseError]): Result = {
+    val maybeInternalServerError: Seq[ThirdPartyResponseError] = errors.collect {
+      case e @ ThirdPartyResponseErrors.UnexpectedError(_) => e
+      case e @ ThirdPartyResponseErrors.UpstreamError      => e
+    }
+    if (maybeInternalServerError.nonEmpty)
+      InternalServerError(createErrorResponses(errors))
+    else
+      BadRequest(createErrorResponses(errors))
   }
 
-  private val createErrorResponse: ThirdPartyResponseError => JsObject = e => Json.obj("error" -> e.errorMessage)
-
-  private val errorMessageKeyToThirdPartyResponseErrors: String => ThirdPartyResponseError = {
-    case "friendlyName.error.invalidCharacters" => ThirdPartyResponseErrors.FriendlyNameInvalidCharacterError
-    case "friendlyName.error.maxLength"         => ThirdPartyResponseErrors.FriendlyNameTooLongError
-    case _                                      => ThirdPartyResponseErrors.UnexpectedError
-  }
-
-  private def jsErrorToMessages(jsError: JsError): Seq[String] = jsError.errors.flatMap(_._2).flatMap(_.messages).toSeq
+  private def createErrorResponses: Seq[ThirdPartyResponseError] => JsObject = e => Json.obj("errors" -> Json.toJson(e.map(_.errorMessage)))
 
 }

@@ -16,17 +16,21 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
-import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
-final case class FriendlyName(value: String) extends AnyVal
+import scala.util.Try
 
-object FriendlyName {
-  private val invalidCharacterReads: Reads[FriendlyName] = JsPath.read[FriendlyName](pattern("""^[0-9a-zA-Z&@£$€¥#.,:;\s-]+$""".r, "error.invalidCharacters").map(FriendlyName(_)))
-  private val tooLongReads: Reads[String] = JsPath.read[String](filterNot[String](JsonValidationError("error.maxLength"))(_.length > 40))
+final case class URL(value: String) extends AnyVal
 
-  val reads: Reads[FriendlyName] = invalidCharacterReads <~ tooLongReads
-  val writes: Writes[FriendlyName] = Json.valueWrites[FriendlyName]
-  implicit val friendlyNameFormat: Format[FriendlyName] = Format[FriendlyName](reads, writes)
+object URL {
+
+  private val validUrlReads: Reads[URL] =
+    JsPath.read[String](
+      filterNot[String](JsonValidationError("error.invalidUrl")) { url => Try(new java.net.URI(url).toURL).isFailure }
+    ).map(URL(_))
+
+  val reads: Reads[URL] = validUrlReads
+  val writes: Writes[URL] = Json.valueWrites[URL]
+  implicit val urlFormat: Format[URL] = Format[URL](reads, writes)
 }

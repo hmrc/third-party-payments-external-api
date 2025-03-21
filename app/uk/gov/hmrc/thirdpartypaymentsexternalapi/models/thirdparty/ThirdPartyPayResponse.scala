@@ -25,25 +25,3 @@ object ThirdPartyPayResponse {
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
   implicit val format: OFormat[ThirdPartyPayResponse] = Json.format[ThirdPartyPayResponse]
 }
-
-sealed trait ThirdPartyResponseError {
-  val errorMessage: String
-}
-
-object ThirdPartyResponseErrors {
-  case object UpstreamError extends ThirdPartyResponseError {
-    val errorMessage = "Error from upstream."
-  }
-  case object FriendlyNameInvalidCharacterError extends ThirdPartyResponseError {
-    val errorMessage = "Friendly name contains invalid character."
-  }
-  case object FriendlyNameTooLongError extends ThirdPartyResponseError {
-    val errorMessage = "Friendly name too long."
-  }
-  case object NonJsonBodyError extends ThirdPartyResponseError {
-    val errorMessage: String = "Request body was not json"
-  }
-  case object UnexpectedError extends ThirdPartyResponseError {
-    val errorMessage: String = "An unexpected error occurred."
-  }
-}

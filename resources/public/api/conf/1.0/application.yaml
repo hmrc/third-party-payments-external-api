@@ -165,11 +165,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  error:
-                    type: string
-                    description: The error field contains the error message.
+                  errors:
+                    type: array
+                    description: The array contains the list of error messages.
+                    items:
+                      type: string
               example:
-                { "error": "Mandatory paymentReference field was omitted." }
+                { "errors": ["Mandatory paymentReference field was omitted."] }
 
         500:
           description: An error occurred upstream and could not be recovered from.
@@ -178,11 +180,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  error:
-                    type: string
-                    description: The error field contains the error message.
+                  errors:
+                    type: array
+                    description: The array contains the list of error messages.
+                    items:
+                      type: string
               example:
-                { "error": "Error from upstream" }
+                { "errors": ["Error from upstream"] }
 
   /status:
     get:

@@ -49,7 +49,7 @@ class PayApiService @Inject() (
         case _: UpstreamErrorResponse => Left(ThirdPartyResponseErrors.UpstreamError)
         case e =>
           Logger(this.getClass).error(s"Unexpected error occurred when trying to start spj: ${e.getMessage}")
-          Left(ThirdPartyResponseErrors.UnexpectedError)
+          Left(ThirdPartyResponseErrors.UnexpectedError("error when trying to start a journey upstream."))
       }
   }
 

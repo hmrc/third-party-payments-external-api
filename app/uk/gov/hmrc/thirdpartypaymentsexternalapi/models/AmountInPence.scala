@@ -16,17 +16,15 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
-import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
-final case class FriendlyName(value: String) extends AnyVal
+final case class AmountInPence(value: Long) extends AnyVal
 
-object FriendlyName {
-  private val invalidCharacterReads: Reads[FriendlyName] = JsPath.read[FriendlyName](pattern("""^[0-9a-zA-Z&@£$€¥#.,:;\s-]+$""".r, "error.invalidCharacters").map(FriendlyName(_)))
-  private val tooLongReads: Reads[String] = JsPath.read[String](filterNot[String](JsonValidationError("error.maxLength"))(_.length > 40))
+object AmountInPence {
+  private val negativeAmountReads: Reads[AmountInPence] = JsPath.read[AmountInPence](filterNot[Long](JsonValidationError("error.minimumValue"))(_ < 0L).map(AmountInPence(_)))
 
-  val reads: Reads[FriendlyName] = invalidCharacterReads <~ tooLongReads
-  val writes: Writes[FriendlyName] = Json.valueWrites[FriendlyName]
-  implicit val friendlyNameFormat: Format[FriendlyName] = Format[FriendlyName](reads, writes)
+  val reads: Reads[AmountInPence] = negativeAmountReads
+  val writes: Writes[AmountInPence] = Json.valueWrites[AmountInPence]
+  implicit val amountInPenceFormat: Format[AmountInPence] = Format[AmountInPence](reads, writes)
 }
