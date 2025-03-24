@@ -32,7 +32,7 @@ class OpenBankingConnectorSpec extends ItSpec {
   "OpenBankingConnector" - {
     "findJourneyByClientId" - {
       "should return a ThirdPartySoftwareFindByClientIdResponse given open-banking call succeeds" in {
-        val expectedResponse = ThirdPartySoftwareFindByClientIdResponse(clientId, "paymentRef", "taxRegime", 1234, "InProgress")
+        val expectedResponse = ThirdPartySoftwareFindByClientIdResponse(clientId, "taxRegime", 1234, "InProgress")
         OpenBankingStub.stubForFindJourneyByClientId(clientId)
 
         val result = openBankingConnector.findJourneyByClientId(clientId)(HeaderCarrier())

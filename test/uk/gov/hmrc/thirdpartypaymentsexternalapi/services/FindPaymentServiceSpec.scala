@@ -36,7 +36,7 @@ class FindPaymentServiceSpec extends ItSpec {
     "findJourneyByClientId" - {
       "should return a ThirdPartySoftwareFindByClientIdResponse given open-banking call succeeds with taxRegime in PascalCase" in {
         //TaxRegime is converted to PascalCase
-        val expectedResponse = ThirdPartySoftwareFindByClientIdResponse(clientId, "paymentRef", "TaxRegime", 1234, "InProgress")
+        val expectedResponse = ThirdPartySoftwareFindByClientIdResponse(clientId, "TaxRegime", 1234, "InProgress")
         OpenBankingStub.stubForFindJourneyByClientId(clientId)
 
         val result = findPaymentService.findJourneyByClientId(clientId)

@@ -20,11 +20,10 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 
 final case class ThirdPartySoftwareFindByClientIdResponse(
-    clientJourneyId:      ClientJourneyId,
-    paymentReference:     String,
-    taxRegime:            String,
-    amountInPence:        Long,
-    paymentJourneyStatus: String
+    clientJourneyId: ClientJourneyId,
+    taxRegime:       String,
+    amountInPence:   Long,
+    paymentStatus:   String
 )
 
 object ThirdPartySoftwareFindByClientIdResponse {
