@@ -1,5 +1,6 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.audit
 
+import play.api.libs.json.{Json, OWrites}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 
 final case class InitiateJourneyAuditDetail(
@@ -15,6 +16,8 @@ final case class InitiateJourneyAuditDetail(
 }
 
 object InitiateJourneyAuditDetail {
+
+  val w: OWrites[InitiateJourneyAuditDetail] = Json.writes[InitiateJourneyAuditDetail]
 
 }
 
