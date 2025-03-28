@@ -22,5 +22,6 @@ import play.api.Configuration
 @Singleton
 class AppConfig @Inject() (config: Configuration) {
 
-  val appName: String = config.get[String]("appName")
+  def externalTestEnabled: Boolean =
+    config.getOptional[Boolean]("external-test.enabled").getOrElse(false)
 }

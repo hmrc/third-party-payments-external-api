@@ -17,20 +17,28 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
 import play.api.libs.json.Json
 import play.api.mvc._
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.helpers.ExternalTest
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.ThirdPartySoftwareFindByClientIdResponse
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.FindPaymentService
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
 class FindPaymentController @Inject() (cc: ControllerComponents, findPaymentService: FindPaymentService)(implicit executionContext: ExecutionContext)
   extends BackendController(cc) {
 
   def status(clientJourneyId: ClientJourneyId): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    findPaymentService.findJourneyByClientId(clientJourneyId).map {
+      def getStatus(request: Request[AnyContent])(implicit hc: HeaderCarrier): Future[ThirdPartySoftwareFindByClientIdResponse] = {
+        if (request.headers.get("Gov-Test-Scenario").isDefined) {
+          ExternalTest.newPaymentJourney(clientJourneyId, request.headers("Gov-Test-Scenario"))
+        } else findPaymentService.findJourneyByClientId(clientJourneyId)
+      }
+
+    getStatus(request).map {
       response => Ok(Json.toJson(response))
     }.recover {
       case e: UpstreamErrorResponse => e.statusCode match {
