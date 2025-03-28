@@ -19,6 +19,7 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.config.AppConfig
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.helpers.ExternalTest
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.ThirdPartySoftwareFindByClientIdResponse
@@ -28,12 +29,12 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class FindPaymentController @Inject() (cc: ControllerComponents, findPaymentService: FindPaymentService)(implicit executionContext: ExecutionContext)
+class FindPaymentController @Inject() (cc: ControllerComponents, findPaymentService: FindPaymentService, appConfig: AppConfig)(implicit executionContext: ExecutionContext)
   extends BackendController(cc) {
 
   def status(clientJourneyId: ClientJourneyId): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
       def getStatus(request: Request[AnyContent])(implicit hc: HeaderCarrier): Future[ThirdPartySoftwareFindByClientIdResponse] = {
-        if (request.headers.get("Gov-Test-Scenario").isDefined) {
+        if (appConfig.externalTestEnabled && request.headers.get("Gov-Test-Scenario").isDefined) {
           ExternalTest.newPaymentJourney(clientJourneyId, request.headers("Gov-Test-Scenario"))
         } else findPaymentService.findJourneyByClientId(clientJourneyId)
       }

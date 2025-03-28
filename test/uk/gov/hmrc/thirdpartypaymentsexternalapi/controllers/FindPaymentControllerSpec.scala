@@ -18,6 +18,7 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
 
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.http.Status
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
@@ -66,18 +67,10 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
     }
   }
 
-  "GET /status" - {
-    "should return a exception when the clientJourneyId is not found" in {
-      val result = findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", "xyz")))
-
-      result.failed.futureValue shouldBe a[Exception]
-    }
-
-    "should return 500 InternalServerError when an exception is thrown" in {
-      val result = findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", "UPSTREAM_ERROR")))
-
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-    }
+  "GET /status when config allows external test" - {
+      def applicationBuilder: GuiceApplicationBuilder = super.applicationBuilder().configure(configMap ++ Map("external-test.enabled" -> true))
+    val app2 = applicationBuilder.build()
+    val findPaymentController = app2.injector.instanceOf[FindPaymentController]
 
     "should return test data when a valid value is provided for the header \"Gov-Test-Scenario\"" - {
       val testCases = Table(
@@ -101,6 +94,18 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
                |}""".stripMargin
           )
         }
+      }
+
+      "should return a exception when the clientJourneyId is not found" in {
+        val result = findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", "xyz")))
+
+        result.failed.futureValue shouldBe a[Exception]
+      }
+
+      "should return 500 InternalServerError when an exception is thrown" in {
+        val result = findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", "UPSTREAM_ERROR")))
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
   }
