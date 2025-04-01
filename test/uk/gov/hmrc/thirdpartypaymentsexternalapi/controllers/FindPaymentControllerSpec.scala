@@ -68,7 +68,7 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
   }
 
   "GET /status when config allows external test" - {
-      def applicationBuilder: GuiceApplicationBuilder = super.applicationBuilder().configure(configMap ++ Map("external-test.enabled" -> true))
+      def applicationBuilder: GuiceApplicationBuilder = super.applicationBuilder().configure(configMap ++ Map("external-test.testOnly-headers.enabled" -> true))
     val app2 = applicationBuilder.build()
     val findPaymentController = app2.injector.instanceOf[FindPaymentController]
 

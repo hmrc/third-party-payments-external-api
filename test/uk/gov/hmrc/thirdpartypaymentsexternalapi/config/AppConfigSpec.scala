@@ -28,11 +28,11 @@ class AppConfigSpec extends AnyWordSpecLike {
     }
 
     "return true when the config value is set to true" in {
-      new AppConfig(Configuration("external-test.enabled" -> true)).externalTestEnabled mustBe true
+      new AppConfig(Configuration("external-test.testOnly-headers.enabled" -> true)).externalTestEnabled mustBe true
     }
 
     "return false when the config value is set to false" in {
-      new AppConfig(Configuration("external-test.enabled" -> false)).externalTestEnabled mustBe false
+      new AppConfig(Configuration("external-test.testOnly-headers.enabled" -> false)).externalTestEnabled mustBe false
     }
   }
 }

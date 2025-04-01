@@ -23,5 +23,5 @@ import play.api.Configuration
 class AppConfig @Inject() (config: Configuration) {
 
   def externalTestEnabled: Boolean =
-    config.getOptional[Boolean]("external-test.enabled").getOrElse(false)
+    config.getOptional[Boolean]("external-test.testOnly-headers.enabled").getOrElse(false)
 }
