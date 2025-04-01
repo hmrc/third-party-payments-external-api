@@ -58,7 +58,9 @@ trait ItSpec extends AnyFreeSpecLike
     }
   }
 
-  override def fakeApplication(): Application = new GuiceApplicationBuilder()
+  def applicationBuilder(): GuiceApplicationBuilder = new GuiceApplicationBuilder()
+    .configure(configMap)
     .overrides(GuiceableModule.fromGuiceModule(overridesModule))
-    .configure(configMap).build()
+
+  override def fakeApplication(): Application = applicationBuilder().build()
 }

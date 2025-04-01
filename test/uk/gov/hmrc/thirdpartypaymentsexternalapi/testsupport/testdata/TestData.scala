@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.thirdpartypaymentsexternalapi.config
+package uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 
-@Singleton
-class AppConfig @Inject() (config: Configuration) {
+import java.util.UUID
 
-  def externalTestEnabled: Boolean =
-    config.getOptional[Boolean]("external-test.testOnly-headers.enabled").getOrElse(false)
+object TestData {
+  val clientJourneyId: ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
 }
