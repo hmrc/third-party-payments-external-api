@@ -78,17 +78,6 @@ paths:
       description: |
         After a successful call to the /pay endpoint, the API user receives JSON with a redirection URL. The API user
         then redirects the customer's browser to this URL, starting the payment journey.
-        
-        ### Test data
-        Scenario simulation using Gov-Test-Scenario headers is *only available in the sandbox environment*.
-        You will not be able to access the frontend screens to complete the journey, but you can use headers in the POST request 
-        to set a journey into a certain state. To achieve this send a Gov-Test-Scenario header with a value matching one of the values below. 
-
-        | Header Value (Gov-Test-Scenario) | Scenario description                                        |
-        | -------------------------------- | ----------------------------------------------------------- |
-        | COMPLETED                        | The payment has completed and the transfer is made.         |
-        | FAILED                           | The payment has failed for one of the following reasons: <br> - The payment was cancelled by the user or timed out at the bank during the payment process. <br> - The bank or building society has rejected the payment. <br> - The payment has failed due to an error. |
-        | IN_PROGRESS                      | The payment is in progress but has not completed or failed. |
 
       security:
         - applicationRestricted: [ ]
@@ -194,7 +183,18 @@ paths:
       description: |
         The API user can check the payment status by providing the clientJourneyId used 
         when the payment journey was created.
-        The JSON body returned will include the clientJourneyId, the taxRegime, the paymentReference, the amountInPence paid and also the paymentStatus. 
+        The JSON body returned will include the clientJourneyId, the taxRegime, the amountInPence paid and also the paymentStatus.
+
+        ### Test data
+        Scenario simulation using Gov-Test-Scenario headers is *only available in the sandbox environment*.
+        You will not be able to access the frontend screens to complete the journey, but you can use headers in the POST request 
+        to set a journey into a certain state. To achieve this send a Gov-Test-Scenario header with a value matching one of the values below. 
+
+        | Header Value (Gov-Test-Scenario) | Scenario description                                        |
+        | -------------------------------- | ----------------------------------------------------------- |
+        | COMPLETED                        | The payment has completed and the transfer is made.         |
+        | FAILED                           | The payment has failed for one of the following reasons: <br> - The payment was cancelled by the user or timed out at the bank during the payment process. <br> - The bank or building society has rejected the payment. <br> - The payment has failed due to an error. |
+        | IN_PROGRESS                      | The payment is in progress but has not completed or failed. |
 
       security:
         - applicationRestricted: [ ]
@@ -217,7 +217,7 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [ clientJourneyId, taxRegime, paymentReference, amountInPence, paymentStatus ]
+                required: [ clientJourneyId, taxRegime, amountInPence, paymentStatus ]
                 properties:
                   clientJourneyId:
                     type: string
