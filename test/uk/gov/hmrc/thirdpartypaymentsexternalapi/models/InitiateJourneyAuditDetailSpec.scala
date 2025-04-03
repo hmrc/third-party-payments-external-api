@@ -33,7 +33,6 @@ class InitiateJourneyAuditDetailSpec extends UnitSpec {
     val testOriginOfRequest: String = ""
     val testClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
 
-
     val initiateJourneyAuditDetail = InitiateJourneyAuditDetail(testOutcome, testTaxRegime, testPaymentReference, testAmount, testOriginOfRequest, testClientJourneyId)
     val jsValue = Json.parse("""{"outcome":{"isSuccessful":true},"taxRegime":"","paymentReference":"","amount":1,"originOfRequest":"","clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96"}""")
 
