@@ -15,7 +15,7 @@ object AuditConnectorStub extends Eventually {
           equalToJson(s"""{ "auditType" : "$auditType"  }""", true, true)
         )
         .withRequestBody(
-          equalToJson(s"""{ "auditSource" : "set-up-payment-plan"  }""", true, true)
+          equalToJson(s"""{ "auditSource" : "third-party-payments-external-api"  }""", true, true)
         )
         .withRequestBody(
           equalToJson(s"""{ "detail" : ${auditEvent.toString} }""", true, true)
@@ -25,5 +25,4 @@ object AuditConnectorStub extends Eventually {
 
   def verifyNoAuditEvent(): Unit =
     verify(exactly(0), postRequestedFor(urlPathEqualTo(auditUrl)))
-
 }

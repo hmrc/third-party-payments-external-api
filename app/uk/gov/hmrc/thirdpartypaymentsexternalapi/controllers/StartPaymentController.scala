@@ -19,13 +19,13 @@ import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.{PayApiService, ValidationService}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.{AuditService, PayApiService, ValidationService}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class StartPaymentController @Inject() (cc: ControllerComponents, payApiService: PayApiService, validationService: ValidationService)(implicit executionContext: ExecutionContext)
+class StartPaymentController @Inject() (auditService: AuditService, cc: ControllerComponents, payApiService: PayApiService, validationService: ValidationService)(implicit executionContext: ExecutionContext)
   extends BackendController(cc) {
 
   def pay(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
@@ -40,13 +40,18 @@ class StartPaymentController @Inject() (cc: ControllerComponents, payApiService:
 
     requestOrErrors match {
       case Left(value) =>
+        auditService.auditInitiateJourneyResult(isSuccessful         = false, maybeErrors = Some(value.map(_.errorMessage)), rawJson = request.body.asJson, maybeClientJourneyId = None)
         Future.successful(thirdPartyResponseErrorToResult(value))
       case Right(value) =>
         payApiService
           .startPaymentJourney(value)
           .map {
-            case Left(error)                  => thirdPartyResponseErrorToResult(Seq(error))
-            case Right(thirdPartyPayResponse) => Created(Json.toJson(thirdPartyPayResponse))
+            case Left(error) =>
+              auditService.auditInitiateJourneyResult(isSuccessful         = false, maybeErrors = Some(Seq(error.errorMessage)), rawJson = request.body.asJson, maybeClientJourneyId = None)
+              thirdPartyResponseErrorToResult(Seq(error))
+            case Right(thirdPartyPayResponse) =>
+              auditService.auditInitiateJourneyResult(isSuccessful         = true, maybeErrors = None, rawJson = request.body.asJson, maybeClientJourneyId = Some(thirdPartyPayResponse.clientJourneyId))
+              Created(Json.toJson(thirdPartyPayResponse))
           }
     }
   }
