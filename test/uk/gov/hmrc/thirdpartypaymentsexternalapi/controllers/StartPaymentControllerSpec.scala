@@ -132,6 +132,7 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(Vat))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
+        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("Vat", None, Some("Error from upstream.")))
         PayApiStub.verifyStartJourneyVat(count = 1)
       }
 
@@ -140,6 +141,7 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(CorporationTax))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
+        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("CorporationTax", None, Some("Error from upstream.")))
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
 
@@ -148,6 +150,7 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
+        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("EmployersPayAsYouEarn", None, Some("Error from upstream.")))
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
     }
