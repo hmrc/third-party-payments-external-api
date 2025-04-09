@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, exactly, postRequestedFor, urlPathEqualTo, verify}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalToJson, exactly, post, postRequestedFor, stubFor, urlEqualTo, urlPathEqualTo, verify}
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.scalatest.concurrent.Eventually
 import play.api.libs.json.JsObject
 
 object AuditConnectorStub extends Eventually {
 
   val auditUrl: String = "/write/audit"
+  val auditMergedUrl: String = "/write/audit/merged"
 
   def verifyEventAudited(auditType: String, auditEvent: JsObject): Unit = eventually {
     verify(
@@ -41,4 +43,9 @@ object AuditConnectorStub extends Eventually {
 
   def verifyNoAuditEvent(): Unit =
     verify(exactly(0), postRequestedFor(urlPathEqualTo(auditUrl)))
+
+  def serviceAvailable(): StubMapping = {
+    stubFor(post(urlEqualTo(auditUrl)).willReturn(aResponse().withStatus(200)))
+    stubFor(post(urlEqualTo(auditMergedUrl)).willReturn(aResponse().withStatus(200)))
+  }
 }

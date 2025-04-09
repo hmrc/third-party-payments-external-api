@@ -20,21 +20,19 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.audit.{InitiateJourneyAuditDetail, Outcome}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
-import java.util.UUID
-
 class InitiateJourneyAuditDetailSpec extends UnitSpec {
 
   "InitiateJourneyAuditDetail" - {
 
-    val testOutcome: Outcome = Outcome(isSuccessful  = true, errorMessages = None)
+    val testOutcome: Outcome = Outcome(isSuccessful  = true, errorMessages = Some(Seq("I am an error")))
     val testTaxRegime: Option[String] = Some("Self Assessment")
-    val testPaymentReference: Option[String] = Some("")
-    val testAmount: Option[BigDecimal] = Some(BigDecimal.valueOf(1))
-    val testOriginOfRequest: Option[String] = Some("")
-    val testClientJourneyId = Some(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96").toString)
+    val testPaymentReference: Option[String] = Some("sedfsdfs")
+    val testAmount: Option[BigDecimal] = Some(BigDecimal(1))
+    val testOriginOfRequest: Option[String] = Some("Test Company")
+    val testClientJourneyId = Some("aef0f31b-3c0f-454b-9d1f-07d549987a96")
 
     val initiateJourneyAuditDetail = InitiateJourneyAuditDetail(testOutcome, testTaxRegime, testPaymentReference, testAmount, testOriginOfRequest, testClientJourneyId)
-    val jsValue = Json.parse("""{"outcome":{"isSuccessful":true},"taxRegime":"Self Assessment","paymentReference":"","amount":1,"originOfRequest":"","clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96"}""")
+    val jsValue = Json.parse("""{"outcome":{"isSuccessful":true,"errorMessages":["I am an error"]},"taxRegime":"Self Assessment","paymentReference":"sedfsdfs","amount":1,"originOfRequest":"Test Company","clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96"}""")
 
     "serialise to json" in {
       Json.toJson(initiateJourneyAuditDetail) shouldBe jsValue
