@@ -25,6 +25,7 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.ThirdPartySof
 
 import java.net.URL
 import javax.inject.{Inject, Singleton}
+import play.mvc.Http.HeaderNames.AUTHORIZATION
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -34,12 +35,14 @@ class OpenBankingConnector @Inject() (
 )(implicit executionContext: ExecutionContext) {
 
   private val openBankingBaseUrl: String = servicesConfig.baseUrl("open-banking") + "/open-banking"
+  private val openBankingAuthToken = servicesConfig.getString("internal-auth.token")
 
   private def findJourneyByClientIdUrl(clientJourneyId: ClientJourneyId): URL = url"$openBankingBaseUrl/payment/search/third-party-software/${clientJourneyId.value}"
 
   def findJourneyByClientId(clientJourneyId: ClientJourneyId)(implicit headerCarrier: HeaderCarrier): Future[ThirdPartySoftwareFindByClientIdResponse] =
     httpClientV2
       .get(findJourneyByClientIdUrl(clientJourneyId))
+      .setHeader(AUTHORIZATION -> openBankingAuthToken)
       .execute[ThirdPartySoftwareFindByClientIdResponse]
 
 }
