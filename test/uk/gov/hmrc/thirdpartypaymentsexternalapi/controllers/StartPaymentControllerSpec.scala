@@ -163,7 +163,6 @@ class StartPaymentControllerSpec extends ItSpec {
 
     "return an BadRequest with all three mandatory fields in error message when they aren't provided" in {
       val result = startPaymentController.pay()(FakeRequest().withJsonBody(Json.parse("""{"IamValidJson":"butnotmatchingthemodel"}""")))
-      // maybeString - List
       status(result) shouldBe Status.BAD_REQUEST
       contentAsJson(result) shouldBe Json.parse("""{
                                                   |  "errors": [
