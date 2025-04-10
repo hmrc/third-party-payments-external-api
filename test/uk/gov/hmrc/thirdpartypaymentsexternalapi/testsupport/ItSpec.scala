@@ -50,12 +50,6 @@ trait ItSpec extends AnyFreeSpecLike
     "microservice.services.open-banking.port" -> self.wireMockPort
   )
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-//    AuditConnectorStub.serviceAvailable()
-    ()
-  }
-
   lazy val overridesModule: AbstractModule = new AbstractModule {
     @Provides
     @Singleton
