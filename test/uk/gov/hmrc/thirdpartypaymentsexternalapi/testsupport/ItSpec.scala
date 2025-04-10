@@ -43,8 +43,9 @@ trait ItSpec extends AnyFreeSpecLike
   implicit lazy val materializer: Materializer = app.materializer
 
   protected lazy val configMap: Map[String, Any] = Map[String, Any](
-    "auditing.enabled" -> false,
+    "auditing.enabled" -> true,
     "auditing.traceRequests" -> false,
+    "auditing.consumer.baseUri.port" -> self.wireMockPort,
     "microservice.services.pay-api.port" -> self.wireMockPort,
     "microservice.services.open-banking.port" -> self.wireMockPort
   )
