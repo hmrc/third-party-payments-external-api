@@ -27,7 +27,6 @@ import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import uk.gov.hmrc.http.test.WireMockSupport
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.ClientJourneyIdGeneratorService
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.AuditConnectorStub
 
 import java.util.UUID
 import scala.annotation.nowarn
