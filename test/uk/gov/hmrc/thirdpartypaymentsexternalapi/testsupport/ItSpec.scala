@@ -53,7 +53,7 @@ trait ItSpec extends AnyFreeSpecLike
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    AuditConnectorStub.serviceAvailable()
+//    AuditConnectorStub.serviceAvailable()
     ()
   }
 
