@@ -84,7 +84,7 @@ paths:
       requestBody:
         description: |
           The request body always contains the fields that allow HMRC to identify the liability that is being paid, so 
-          that the funds are not mis-allocated. The required fields are the taxRegime, the paymentReference and amountInPence.
+          that the funds are not mis-allocated. The required fields are the taxRegime, the reference and amountInPence.
           The backURL is an optional field containing a url to return the user to after they finish their payment.
           The friendlyName is an optional field to let the user know where they are being returned to after they finish their payment.
         required: true
@@ -94,7 +94,7 @@ paths:
               title: Pay request schema
               description: The JSON describing an HMRC third party payment /pay payload.
               type: object
-              required: [ taxRegime, paymentReference, amountInPence ]
+              required: [ taxRegime, reference, amountInPence ]
               properties:
                 taxRegime:
                   type: string
@@ -102,7 +102,7 @@ paths:
                     The tax regime under which the liability has arisen. One of a fixed set. Currently supported regimes are: Self Assessment and Vat.
                   enum: [ SelfAssessment, Vat ]
                   example: SelfAssessment
-                paymentReference:
+                reference:
                   description: The reference identifying the tax liability. For Self Assessment this is the 10 digit Unique Taxpayer Reference. For VAT this is the 9-digit VAT registration number.
                   type: string
                   example: "1097172564"
@@ -160,7 +160,7 @@ paths:
                     items:
                       type: string
               example:
-                { "errors": ["Mandatory paymentReference field was omitted."] }
+                { "errors": ["Mandatory reference field was omitted."] }
 
         500:
           description: An error occurred upstream and could not be recovered from.
