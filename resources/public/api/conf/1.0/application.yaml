@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 
 info:
-  version: 1.0.2
+  version: 1.0.3
   title: Initiate payment
   description: |
     This API allows users to trigger an HMRC payment journey from their software. 
@@ -13,6 +13,14 @@ info:
     by the API user by taking advantage of the /status endpoint.
 
     Typical lifetimes for journey storage are not yet determined.
+    
+    <div class="govuk-warning-text warning-icon-fix">
+      <span class="govuk-warning-text__icon warning-icon-ui-fix" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-warning-text__assistive">Warning</span>
+        During this period if you wish to develop to this API please register your interest with SDST. We will update this page as soon as the API is available for general use.
+      </strong>
+    </div>
 
 servers:
   - url: https://test-api.service.hmrc.gov.uk/payments/make-payment
