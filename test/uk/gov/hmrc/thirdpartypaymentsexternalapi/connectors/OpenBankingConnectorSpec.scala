@@ -42,7 +42,7 @@ class OpenBankingConnectorSpec extends ItSpec {
 
         result.futureValue shouldBe expectedResponse
         verify(getRequestedFor(urlPathEqualTo("/open-banking/payment/search/third-party-software/aef0f31b-3c0f-454b-9d1f-07d549987a96"))
-        .withHeader("AUTHORIZATION", equalTo("wowow")))
+          .withHeader("AUTHORIZATION", equalTo("wowow")))
       }
 
       "should propagate a 5xx error when open-banking returns a 5xx" in {
