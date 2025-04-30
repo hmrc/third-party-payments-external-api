@@ -47,7 +47,8 @@ trait ItSpec extends AnyFreeSpecLike
     "auditing.traceRequests" -> false,
     "auditing.consumer.baseUri.port" -> self.wireMockPort,
     "microservice.services.pay-api.port" -> self.wireMockPort,
-    "microservice.services.open-banking.port" -> self.wireMockPort
+    "microservice.services.open-banking.port" -> self.wireMockPort,
+    "internal-auth.token" -> "wowow"
   )
 
   lazy val overridesModule: AbstractModule = new AbstractModule {

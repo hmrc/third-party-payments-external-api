@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, getRequestedFor, urlPathEqualTo, verify}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.ThirdPartySoftwareFindByClientIdResponse
@@ -31,13 +32,17 @@ class OpenBankingConnectorSpec extends ItSpec {
 
   "OpenBankingConnector" - {
     "findJourneyByClientId" - {
-      "should return a ThirdPartySoftwareFindByClientIdResponse given open-banking call succeeds" in {
+      //tried writing a test for no config but the test kept crashing
+      "should return a ThirdPartySoftwareFindByClientIdResponse given open-banking call succeeds when config is set" in {
+        //Set in Itspec
         val expectedResponse = ThirdPartySoftwareFindByClientIdResponse(clientId, "taxRegime", 1234, "InProgress")
         OpenBankingStub.stubForFindJourneyByClientId(clientId)
 
         val result = openBankingConnector.findJourneyByClientId(clientId)(HeaderCarrier())
 
         result.futureValue shouldBe expectedResponse
+        verify(getRequestedFor(urlPathEqualTo("/open-banking/payment/search/third-party-software/aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+          .withHeader("AUTHORIZATION", equalTo("wowow")))
       }
 
       "should propagate a 5xx error when open-banking returns a 5xx" in {
