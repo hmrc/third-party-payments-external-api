@@ -95,6 +95,7 @@ paths:
           that the funds are not mis-allocated. The required fields are the taxRegime, the reference and amountInPence.
           The backURL is an optional field containing a url to return the user to after they finish their payment.
           The friendlyName is an optional field to let the user know where they are being returned to after they finish their payment.
+          If a field is labeled as optional, we intend this to mean that it should be *omitted entirely* - not sent through with a null value etc.
         required: true
         content:
           application/json:

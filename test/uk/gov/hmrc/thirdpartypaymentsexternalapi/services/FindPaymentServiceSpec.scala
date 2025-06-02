@@ -53,5 +53,15 @@ class FindPaymentServiceSpec extends ItSpec {
       }
     }
 
+    "camelToPascalCase" - {
+      "converts camel to pascal case" in {
+        findPaymentService.camelToPascalCase("taxType") shouldBe "TaxType"
+      }
+
+      "return empty string if input string is empty" in {
+        findPaymentService.camelToPascalCase("") shouldBe ""
+      }
+    }
+
   }
 }

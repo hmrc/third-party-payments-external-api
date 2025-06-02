@@ -34,7 +34,7 @@ class FindPaymentService @Inject() (
       response.copy(taxRegime = camelToPascalCase(response.taxRegime))
     }
 
-  private def camelToPascalCase(camelCase: String): String = {
+  private[services] def camelToPascalCase(camelCase: String): String = {
     if (camelCase.isEmpty) camelCase
     else s"${camelCase.head.toUpper.toString}${camelCase.tail}"
   }

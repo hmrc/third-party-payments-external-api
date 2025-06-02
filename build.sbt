@@ -6,7 +6,7 @@ StrictBuilding.strictBuildingSetting
 //---
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.16"
 
 lazy val microservice = Project("third-party-payments-external-api", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -19,7 +19,6 @@ lazy val microservice = Project("third-party-payments-external-api", file("."))
     }
   )
   .settings(PlayKeys.playDefaultPort := 10156)
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(commands ++= SbtCommands.commands)
   .settings(CodeCoverageSettings.settings *)
   .settings(SbtUpdatesSettings.sbtUpdatesSettings *)
