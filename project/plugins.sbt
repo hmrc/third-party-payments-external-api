@@ -5,8 +5,8 @@ ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" 
 
 addSbtPlugin("uk.gov.hmrc"        % "sbt-auto-build"     % "3.24.0")
 addSbtPlugin("uk.gov.hmrc"        % "sbt-distributables" % "2.6.0")
-addSbtPlugin("org.playframework"  % "sbt-plugin"         % "3.0.6")
-addSbtPlugin("org.scoverage"      % "sbt-scoverage"      % "2.0.12")
-addSbtPlugin("org.wartremover"   %  "sbt-wartremover"    % "3.1.6")
+addSbtPlugin("org.playframework"  % "sbt-plugin"         % "3.0.7")
+addSbtPlugin("org.scoverage"      % "sbt-scoverage"      % "2.3.1")
+addSbtPlugin("org.wartremover"   %  "sbt-wartremover"    % "3.3.4")
 addSbtPlugin("org.scalariform"   %% "sbt-scalariform"    % "1.8.3")
 addSbtPlugin("com.timushev.sbt"  %  "sbt-updates"        % "0.6.3")

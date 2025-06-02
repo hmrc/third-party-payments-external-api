@@ -17,12 +17,12 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
 
 import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.AnyContentAsJson
+import play.api.mvc.{AnyContentAsJson, Result, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
 import play.mvc.Http.Status
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, ClientJourneyId, FriendlyName, Reference, TaxRegime, URL}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.{AuditConnectorStub, PayApiStub}
@@ -245,6 +245,11 @@ class StartPaymentControllerSpec extends ItSpec {
       }
     }
 
+  }
+
+  "thirdPartyResponseErrorToResult should throw an InternalServer error when given a ThirdPartyResponseErrors.UnexpectedError(_)" in {
+    val result: Result = startPaymentController.thirdPartyResponseErrorToResult(Seq(ThirdPartyResponseErrors.UnexpectedError("some reason")))
+    result.header.status shouldBe Results.InternalServerError.header.status
   }
 
 }
