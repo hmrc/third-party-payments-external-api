@@ -58,7 +58,7 @@ class FindPaymentServiceSpec extends ItSpec {
         findPaymentService.camelToPascalCase("taxType") shouldBe "TaxType"
       }
 
-      "return x if string is empty" in {
+      "return empty string if input string is empty" in {
         findPaymentService.camelToPascalCase("") shouldBe ""
       }
     }
