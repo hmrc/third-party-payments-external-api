@@ -29,24 +29,33 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class FindPaymentController @Inject() (cc: ControllerComponents, findPaymentService: FindPaymentService, appConfig: AppConfig)(implicit executionContext: ExecutionContext)
-  extends BackendController(cc) {
+class FindPaymentController @Inject() (
+  cc:                 ControllerComponents,
+  findPaymentService: FindPaymentService,
+  appConfig:          AppConfig
+)(implicit executionContext: ExecutionContext)
+    extends BackendController(cc) {
 
-  def status(clientJourneyId: ClientJourneyId): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-      def getStatus(request: Request[AnyContent])(implicit hc: HeaderCarrier): Future[ThirdPartySoftwareFindByClientIdResponse] = {
-        if (appConfig.externalTestEnabled && request.headers.get("Gov-Test-Scenario").isDefined) {
-          ExternalTest.newPaymentJourney(clientJourneyId, request.headers("Gov-Test-Scenario"))
-        } else findPaymentService.findJourneyByClientId(clientJourneyId)
-      }
+  def status(clientJourneyId: ClientJourneyId): Action[AnyContent] = Action.async {
+    implicit request: Request[AnyContent] =>
+      getStatus(request, clientJourneyId)
+        .map { response =>
+          Ok(Json.toJson(response))
+        }
+        .recover { case e: UpstreamErrorResponse =>
+          e.statusCode match {
+            case 404 => NotFound
+            case _   => InternalServerError
+          }
+        }
+  }
 
-    getStatus(request).map {
-      response => Ok(Json.toJson(response))
-    }.recover {
-      case e: UpstreamErrorResponse => e.statusCode match {
-        case 404 => NotFound
-        case _   => InternalServerError
-      }
-    }
+  private def getStatus(request: Request[AnyContent], clientJourneyId: ClientJourneyId)(implicit
+    hc: HeaderCarrier
+  ): Future[ThirdPartySoftwareFindByClientIdResponse] = {
+    if (appConfig.externalTestEnabled && request.headers.get("Gov-Test-Scenario").isDefined) {
+      ExternalTest.newPaymentJourney(clientJourneyId, request.headers("Gov-Test-Scenario"))
+    } else findPaymentService.findJourneyByClientId(clientJourneyId)
   }
 
 }

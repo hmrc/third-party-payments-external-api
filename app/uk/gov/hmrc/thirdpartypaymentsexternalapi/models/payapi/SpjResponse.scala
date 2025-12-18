@@ -19,9 +19,9 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi
 import play.api.libs.json.{Json, OFormat}
 
 final case class SpjResponse(
-    journeyId: JourneyId,
-    nextUrl:   NextUrl
-)
+  journeyId: JourneyId,
+  nextUrl:   NextUrl
+) derives CanEqual
 
 object SpjResponse {
   @SuppressWarnings(Array("org.wartremover.warts.Any"))

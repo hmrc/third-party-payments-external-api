@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.config
 
-import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatest.matchers.must.Matchers.mustBe
 import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.Configuration
 

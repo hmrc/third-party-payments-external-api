@@ -18,48 +18,50 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty
 
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.{SpjRequest3psCorporationTax, SpjRequest3psEmployersPayAsYouEarn, SpjRequest3psSa, SpjRequest3psVat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, URL, ClientJourneyId, FriendlyName, Reference, TaxRegime}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, ClientJourneyId, FriendlyName, Reference, TaxRegime, URL}
 
 final case class ThirdPartyPayRequest(
-    taxRegime:     TaxRegime,
-    reference:     Reference,
-    amountInPence: AmountInPence,
-    friendlyName:  Option[FriendlyName],
-    backURL:       Option[URL]
-) {
+  taxRegime:     TaxRegime,
+  reference:     Reference,
+  amountInPence: AmountInPence,
+  friendlyName:  Option[FriendlyName],
+  backURL:       Option[URL]
+) derives CanEqual {
 
-  def asSaSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psSa = SpjRequest3psSa(
-    utr             = reference,
-    amountInPence   = amountInPence,
+  def asSaSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psSa                                       = SpjRequest3psSa(
+    utr = reference,
+    amountInPence = amountInPence,
     clientJourneyId = clientJourneyId,
-    friendlyName    = friendlyName,
-    returnUrl       = backURL,
-    backUrl         = backURL
+    friendlyName = friendlyName,
+    returnUrl = backURL,
+    backUrl = backURL
   )
-  def asVatSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psVat = SpjRequest3psVat(
-    vrn             = reference,
-    amountInPence   = amountInPence,
+  def asVatSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psVat                                     = SpjRequest3psVat(
+    vrn = reference,
+    amountInPence = amountInPence,
     clientJourneyId = clientJourneyId,
-    friendlyName    = friendlyName,
-    returnUrl       = backURL,
-    backUrl         = backURL
+    friendlyName = friendlyName,
+    returnUrl = backURL,
+    backUrl = backURL
   )
-  def asCorporationTaxSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psCorporationTax = SpjRequest3psCorporationTax(
-    vrn             = reference,
-    amountInPence   = amountInPence,
-    clientJourneyId = clientJourneyId,
-    friendlyName    = friendlyName,
-    returnUrl       = backURL,
-    backUrl         = backURL
-  )
-  def asEmployersPayAsYouEarnSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psEmployersPayAsYouEarn = SpjRequest3psEmployersPayAsYouEarn(
-    vrn             = reference,
-    amountInPence   = amountInPence,
-    clientJourneyId = clientJourneyId,
-    friendlyName    = friendlyName,
-    returnUrl       = backURL,
-    backUrl         = backURL
-  )
+  def asCorporationTaxSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psCorporationTax               =
+    SpjRequest3psCorporationTax(
+      vrn = reference,
+      amountInPence = amountInPence,
+      clientJourneyId = clientJourneyId,
+      friendlyName = friendlyName,
+      returnUrl = backURL,
+      backUrl = backURL
+    )
+  def asEmployersPayAsYouEarnSpjRequest(clientJourneyId: ClientJourneyId): SpjRequest3psEmployersPayAsYouEarn =
+    SpjRequest3psEmployersPayAsYouEarn(
+      vrn = reference,
+      amountInPence = amountInPence,
+      clientJourneyId = clientJourneyId,
+      friendlyName = friendlyName,
+      returnUrl = backURL,
+      backUrl = backURL
+    )
 }
 
 object ThirdPartyPayRequest {

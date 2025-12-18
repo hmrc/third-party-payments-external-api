@@ -19,12 +19,12 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.audit
 import play.api.libs.json.{Json, OFormat}
 
 final case class InitiateJourneyAuditDetail(
-    outcome:          Outcome,
-    taxRegime:        Option[String],
-    paymentReference: Option[String],
-    amount:           Option[BigDecimal],
-    originOfRequest:  Option[String],
-    clientJourneyId:  Option[String]
+  outcome:          Outcome,
+  taxRegime:        Option[String],
+  paymentReference: Option[String],
+  amount:           Option[BigDecimal],
+  originOfRequest:  Option[String],
+  clientJourneyId:  Option[String]
 ) extends AuditDetail {
   val auditType: String = "InitiateJourney"
 }
@@ -35,4 +35,3 @@ object InitiateJourneyAuditDetail {
   implicit val format: OFormat[InitiateJourneyAuditDetail] = Json.format[InitiateJourneyAuditDetail]
 
 }
-

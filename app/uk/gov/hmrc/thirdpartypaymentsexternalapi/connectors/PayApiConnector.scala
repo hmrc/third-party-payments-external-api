@@ -17,6 +17,7 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors
 
 import play.api.libs.json.{Json, Writes}
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
@@ -30,37 +31,57 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PayApiConnector @Inject() (
-    httpClientV2:   HttpClientV2,
-    servicesConfig: ServicesConfig
+  httpClientV2:   HttpClientV2,
+  servicesConfig: ServicesConfig
 )(implicit executionContext: ExecutionContext) {
 
   private val payApiBaseUrl: String = servicesConfig.baseUrl("pay-api") + "/pay-api"
 
-  private val startSelfAssessmentJourneyUrl: URL = url"$payApiBaseUrl/third-party-software/self-assessment/journey/start"
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  private val startSelfAssessmentJourneyUrl: URL =
+    url"$payApiBaseUrl/third-party-software/self-assessment/journey/start"
 
-  def startSelfAssessmentJourney(spjRequest: SpjRequest3psSa)(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] =
+  def startSelfAssessmentJourney(spjRequest: SpjRequest3psSa)(implicit
+    headerCarrier: HeaderCarrier
+  ): Future[SpjResponse] =
     startPaymentJourney[SpjRequest3psSa](startSelfAssessmentJourneyUrl, spjRequest)(SpjRequest3psSa.format)
 
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   private val startVatJourneyUrl: URL = url"$payApiBaseUrl/third-party-software/vat/journey/start"
 
   def startVatJourney(spjRequest: SpjRequest3psVat)(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] =
     startPaymentJourney[SpjRequest3psVat](startVatJourneyUrl, spjRequest)(SpjRequest3psVat.format)
 
-  private val startCorporationTaxJourneyUrl: URL = url"$payApiBaseUrl/third-party-software/corporation-tax/journey/start"
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  private val startCorporationTaxJourneyUrl: URL =
+    url"$payApiBaseUrl/third-party-software/corporation-tax/journey/start"
 
-  def startCorporationTaxJourney(spjRequest: SpjRequest3psCorporationTax)(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] =
-    startPaymentJourney[SpjRequest3psCorporationTax](startCorporationTaxJourneyUrl, spjRequest)(SpjRequest3psCorporationTax.format)
+  def startCorporationTaxJourney(
+    spjRequest: SpjRequest3psCorporationTax
+  )(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] =
+    startPaymentJourney[SpjRequest3psCorporationTax](startCorporationTaxJourneyUrl, spjRequest)(
+      SpjRequest3psCorporationTax.format
+    )
 
-  private val startEmployersPayAsYouEarnJourneyUrl: URL = url"$payApiBaseUrl/third-party-software/employers-pay-as-you-earn/journey/start"
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  private val startEmployersPayAsYouEarnJourneyUrl: URL =
+    url"$payApiBaseUrl/third-party-software/employers-pay-as-you-earn/journey/start"
 
-  def startEmployersPayAsYouEarnJourney(spjRequest: SpjRequest3psEmployersPayAsYouEarn)(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] =
-    startPaymentJourney[SpjRequest3psEmployersPayAsYouEarn](startEmployersPayAsYouEarnJourneyUrl, spjRequest)(SpjRequest3psEmployersPayAsYouEarn.format)
+  def startEmployersPayAsYouEarnJourney(
+    spjRequest: SpjRequest3psEmployersPayAsYouEarn
+  )(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] =
+    startPaymentJourney[SpjRequest3psEmployersPayAsYouEarn](startEmployersPayAsYouEarnJourneyUrl, spjRequest)(
+      SpjRequest3psEmployersPayAsYouEarn.format
+    )
 
-  private def startPaymentJourney[Spj <: SpjRequest](url: URL, spjRequest: Spj)(spjRequestWrites: Writes[Spj])(implicit headerCarrier: HeaderCarrier): Future[SpjResponse] = {
-    httpClientV2.post(url)
+  private def startPaymentJourney[Spj <: SpjRequest](url: URL, spjRequest: Spj)(
+    spjRequestWrites: Writes[Spj]
+  )(using headerCarrier: HeaderCarrier): Future[SpjResponse] = {
+    httpClientV2
+      .post(url)
       // We add random x-session-id as pay-api requires it. We update it in pay-api after finding journey in pay-frontend via traceId.
       .setHeader("x-session-id" -> UUID.randomUUID().toString)
-      .withBody(Json.toJson(spjRequest)(spjRequestWrites))
+      .withBody(Json.toJson(spjRequest)(using spjRequestWrites))
       .execute[SpjResponse]
   }
 }

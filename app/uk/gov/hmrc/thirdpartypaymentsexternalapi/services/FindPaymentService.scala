@@ -26,17 +26,20 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FindPaymentService @Inject() (
-    openBankingConnector: OpenBankingConnector
+  openBankingConnector: OpenBankingConnector
 )(implicit executionContext: ExecutionContext) {
 
-  def findJourneyByClientId(clientJourneyId: ClientJourneyId)(implicit hc: HeaderCarrier): Future[ThirdPartySoftwareFindByClientIdResponse] =
+  def findJourneyByClientId(
+    clientJourneyId: ClientJourneyId
+  )(implicit hc: HeaderCarrier): Future[ThirdPartySoftwareFindByClientIdResponse] =
     openBankingConnector.findJourneyByClientId(clientJourneyId).map { response =>
       response.copy(taxRegime = camelToPascalCase(response.taxRegime))
     }
 
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   private[services] def camelToPascalCase(camelCase: String): String = {
     if (camelCase.isEmpty) camelCase
-    else s"${camelCase.head.toUpper.toString}${camelCase.tail}"
+    else camelCase.head.toUpper.toString + camelCase.tail
   }
 
 }

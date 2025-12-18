@@ -40,19 +40,19 @@ class ExternalTestSpec extends ItSpec with TableDrivenPropertyChecks {
     }
 
     "should return a valid response" - {
-        def expectedResponse(paymentStatus: String) =
-          ThirdPartySoftwareFindByClientIdResponse(
-            clientJourneyId = clientJourneyId,
-            taxRegime       = "taxRegime",
-            amountInPence   = 123456L,
-            paymentStatus   = paymentStatus
-          )
+      def expectedResponse(paymentStatus: String): ThirdPartySoftwareFindByClientIdResponse =
+        ThirdPartySoftwareFindByClientIdResponse(
+          clientJourneyId = clientJourneyId,
+          taxRegime = "taxRegime",
+          amountInPence = 123456L,
+          paymentStatus = paymentStatus
+        )
 
       val testCases = Table(
         ("header", "expectedStatus"),
         ("IN_PROGRESS", "InProgress"),
         ("COMPLETED", "Completed"),
-        ("FAILED", "Failed"),
+        ("FAILED", "Failed")
       )
 
       forAll(testCases) { (header, expectedStatus) =>

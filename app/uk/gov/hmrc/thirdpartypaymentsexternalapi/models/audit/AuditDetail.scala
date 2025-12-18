@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.audit
 
-trait AuditDetail {
+trait AuditDetail derives CanEqual {
 
   val auditType: String
 

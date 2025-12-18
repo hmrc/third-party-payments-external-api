@@ -25,10 +25,11 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata.PayApiTest
 
 object PayApiStub {
 
-  private val selfAssessmentPath: String = s"/pay-api/third-party-software/self-assessment/journey/start"
-  private val vatPath: String = s"/pay-api/third-party-software/vat/journey/start"
-  private val corporationTaxPath: String = s"/pay-api/third-party-software/corporation-tax/journey/start"
-  private val employersPayAsYouEarnPath: String = s"/pay-api/third-party-software/employers-pay-as-you-earn/journey/start"
+  private val selfAssessmentPath: String        = s"/pay-api/third-party-software/self-assessment/journey/start"
+  private val vatPath: String                   = s"/pay-api/third-party-software/vat/journey/start"
+  private val corporationTaxPath: String        = s"/pay-api/third-party-software/corporation-tax/journey/start"
+  private val employersPayAsYouEarnPath: String =
+    s"/pay-api/third-party-software/employers-pay-as-you-earn/journey/start"
 
   private def verifyPost(count: Int, url: String): Unit = {
     val uuidRegex: String = """^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$"""

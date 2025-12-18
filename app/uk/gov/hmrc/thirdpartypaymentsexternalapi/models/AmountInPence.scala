@@ -22,9 +22,11 @@ import play.api.libs.json._
 final case class AmountInPence(value: Long) extends AnyVal
 
 object AmountInPence {
-  private val negativeAmountReads: Reads[AmountInPence] = JsPath.read[AmountInPence](filterNot[Long](JsonValidationError("error.minimumValue"))(_ < 0L).map(AmountInPence(_)))
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  private val negativeAmountReads: Reads[AmountInPence] =
+    JsPath.read[AmountInPence](using filterNot[Long](JsonValidationError("error.minimumValue"))(_ < 0L).map(AmountInPence(_)))
 
-  val reads: Reads[AmountInPence] = negativeAmountReads
-  val writes: Writes[AmountInPence] = Json.valueWrites[AmountInPence]
+  val reads: Reads[AmountInPence]                         = negativeAmountReads
+  val writes: Writes[AmountInPence]                       = Json.valueWrites[AmountInPence]
   implicit val amountInPenceFormat: Format[AmountInPence] = Format[AmountInPence](reads, writes)
 }

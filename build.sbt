@@ -6,7 +6,7 @@ StrictBuilding.strictBuildingSetting
 //---
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.7.4"
 
 lazy val microservice = Project("third-party-payments-external-api", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -22,7 +22,6 @@ lazy val microservice = Project("third-party-payments-external-api", file("."))
   .settings(commands ++= SbtCommands.commands)
   .settings(CodeCoverageSettings.settings *)
   .settings(SbtUpdatesSettings.sbtUpdatesSettings *)
-  .settings(ScalariformSettings.scalariformSettings *)
   .settings(WartRemoverSettings.wartRemoverSettings *)
   .settings(
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",

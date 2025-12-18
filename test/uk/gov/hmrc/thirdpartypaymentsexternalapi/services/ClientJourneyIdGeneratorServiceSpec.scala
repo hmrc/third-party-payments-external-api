@@ -20,13 +20,15 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
 class ClientJourneyIdGeneratorServiceSpec extends UnitSpec {
 
+  given CanEqual[Seq[String], Seq[String]] = CanEqual.derived
+
   val clientJourneyIdGeneratorService = new ClientJourneyIdGeneratorService
 
   "ClientJourneyIdGeneratorService.nextClientJourneyId" - {
     "should generate a random UUID" in {
-        def fiftyRandomNextClientJourneyId: Seq[String] = (1 to 50).map { _ =>
-          clientJourneyIdGeneratorService.nextClientJourneyId().value.toString
-        }
+      def fiftyRandomNextClientJourneyId: Seq[String] = (1 to 50).map { _ =>
+        clientJourneyIdGeneratorService.nextClientJourneyId().value.toString
+      }
 
       fiftyRandomNextClientJourneyId should not contain theSameElementsAs(fiftyRandomNextClientJourneyId)
 

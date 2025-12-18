@@ -30,16 +30,20 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class OpenBankingConnector @Inject() (
-    httpClientV2:   HttpClientV2,
-    servicesConfig: ServicesConfig
+  httpClientV2:   HttpClientV2,
+  servicesConfig: ServicesConfig
 )(implicit executionContext: ExecutionContext) {
 
   private val openBankingBaseUrl: String = servicesConfig.baseUrl("open-banking") + "/open-banking"
-  private val openBankingAuthToken = servicesConfig.getString("internal-auth.token")
+  private val openBankingAuthToken       = servicesConfig.getString("internal-auth.token")
 
-  private def findJourneyByClientIdUrl(clientJourneyId: ClientJourneyId): URL = url"$openBankingBaseUrl/payment/search/third-party-software/${clientJourneyId.value}"
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  private def findJourneyByClientIdUrl(clientJourneyId: ClientJourneyId): URL =
+    url"$openBankingBaseUrl/payment/search/third-party-software/${clientJourneyId.value.toString}"
 
-  def findJourneyByClientId(clientJourneyId: ClientJourneyId)(implicit headerCarrier: HeaderCarrier): Future[ThirdPartySoftwareFindByClientIdResponse] =
+  def findJourneyByClientId(
+    clientJourneyId: ClientJourneyId
+  )(implicit headerCarrier: HeaderCarrier): Future[ThirdPartySoftwareFindByClientIdResponse] =
     httpClientV2
       .get(findJourneyByClientIdUrl(clientJourneyId))
       .setHeader(AUTHORIZATION -> openBankingAuthToken)

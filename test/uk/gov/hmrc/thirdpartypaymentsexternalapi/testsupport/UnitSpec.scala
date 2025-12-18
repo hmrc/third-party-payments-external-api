@@ -17,5 +17,9 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.freespec.AnyFreeSpec
+import play.api.libs.json.JsValue
 
-trait UnitSpec extends AnyFreeSpec with Matchers
+trait UnitSpec extends AnyFreeSpec with Matchers {
+  // reusable CanEquals
+  given CanEqual[JsValue, JsValue] = CanEqual.derived
+}

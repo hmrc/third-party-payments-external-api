@@ -24,13 +24,17 @@ import java.util.UUID
 
 class ThirdPartyPayResponseSpec extends UnitSpec {
 
+  given CanEqual[ThirdPartyPayResponse, ThirdPartyPayResponse] = CanEqual.derived
+  given CanEqual[Either[?, ?], Either[?,?]] = CanEqual.derived
+
   "ThirdPartyPayResponse" - {
 
     val thirdPartyPayResponse = ThirdPartyPayResponse(
       clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")),
-      redirectURL     = RedirectUrl("some-redirect-url")
+      redirectURL = RedirectUrl("some-redirect-url")
     )
-    val jsValue = Json.parse(s"""{"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","redirectURL":"some-redirect-url"}""")
+    val jsValue               =
+      Json.parse(s"""{"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","redirectURL":"some-redirect-url"}""")
 
     "serialise to json" in {
       Json.toJson(thirdPartyPayResponse) shouldBe jsValue

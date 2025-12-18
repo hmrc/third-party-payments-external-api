@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors.PayApiConnector
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty._
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.*
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{ClientJourneyId, TaxRegime}
 
 import javax.inject.{Inject, Singleton}
@@ -28,27 +28,39 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PayApiService @Inject() (
-    payApiConnector:                 PayApiConnector,
-    clientJourneyIdGeneratorService: ClientJourneyIdGeneratorService
-)(implicit executionContext: ExecutionContext) {
+  payApiConnector:                 PayApiConnector,
+  clientJourneyIdGeneratorService: ClientJourneyIdGeneratorService
+)(implicit executionContext: ExecutionContext) extends Logging {
 
-  def startPaymentJourney(thirdPartyPayRequest: ThirdPartyPayRequest)(implicit headerCarrier: HeaderCarrier): Future[Either[ThirdPartyResponseError, ThirdPartyPayResponse]] = {
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  def startPaymentJourney(
+    thirdPartyPayRequest: ThirdPartyPayRequest
+  )(implicit headerCarrier: HeaderCarrier): Future[Either[ThirdPartyResponseError, ThirdPartyPayResponse]] = {
 
     val clientJourneyId: ClientJourneyId = clientJourneyIdGeneratorService.nextClientJourneyId()
 
     val spjResponseF: Future[SpjResponse] = thirdPartyPayRequest.taxRegime match {
-      case TaxRegime.SelfAssessment        => payApiConnector.startSelfAssessmentJourney(thirdPartyPayRequest.asSaSpjRequest(clientJourneyId))
+      case TaxRegime.SelfAssessment        =>
+        payApiConnector.startSelfAssessmentJourney(thirdPartyPayRequest.asSaSpjRequest(clientJourneyId))
       case TaxRegime.Vat                   => payApiConnector.startVatJourney(thirdPartyPayRequest.asVatSpjRequest(clientJourneyId))
-      case TaxRegime.CorporationTax        => payApiConnector.startCorporationTaxJourney(thirdPartyPayRequest.asCorporationTaxSpjRequest(clientJourneyId))
-      case TaxRegime.EmployersPayAsYouEarn => payApiConnector.startEmployersPayAsYouEarnJourney(thirdPartyPayRequest.asEmployersPayAsYouEarnSpjRequest(clientJourneyId))
+      case TaxRegime.CorporationTax        =>
+        payApiConnector.startCorporationTaxJourney(thirdPartyPayRequest.asCorporationTaxSpjRequest(clientJourneyId))
+      case TaxRegime.EmployersPayAsYouEarn =>
+        payApiConnector.startEmployersPayAsYouEarnJourney(
+          thirdPartyPayRequest.asEmployersPayAsYouEarnSpjRequest(clientJourneyId)
+        )
     }
 
     spjResponseF
-      .map(spjResponse => Right(ThirdPartyPayResponse(clientJourneyId = clientJourneyId, redirectURL = RedirectUrl(spjResponse.nextUrl.value))))
+      .map(spjResponse =>
+        Right(
+          ThirdPartyPayResponse(clientJourneyId = clientJourneyId, redirectURL = RedirectUrl(spjResponse.nextUrl.value))
+        )
+      )
       .recover {
         case _: UpstreamErrorResponse => Left(ThirdPartyResponseErrors.UpstreamError)
-        case e =>
-          Logger(this.getClass).error(s"Unexpected error occurred when trying to start spj: ${e.getMessage}")
+        case e                        =>
+          logger.error(s"Unexpected error occurred when trying to start spj: ${e.getMessage}")
           Left(ThirdPartyResponseErrors.UnexpectedError("error when trying to start a journey upstream."))
       }
   }
