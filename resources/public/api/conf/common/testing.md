@@ -8,4 +8,4 @@ You will need to follow these steps to test the full journeys:
 * Sign in with username "alice"
 * Enter password "secret"
 * Select either account that has enough balance for the transaction
-* Continue through to be redirected back to HMRC confirmation screen"
+* Continue through to be redirected back to HMRC confirmation screen
