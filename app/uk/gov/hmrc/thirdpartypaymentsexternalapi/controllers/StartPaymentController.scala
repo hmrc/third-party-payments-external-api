@@ -25,8 +25,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class StartPaymentController @Inject() (auditService: AuditService, cc: ControllerComponents, payApiService: PayApiService, validationService: ValidationService)(implicit executionContext: ExecutionContext)
-  extends BackendController(cc) {
+class StartPaymentController @Inject() (
+  auditService:      AuditService,
+  cc:                ControllerComponents,
+  payApiService:     PayApiService,
+  validationService: ValidationService
+)(implicit executionContext: ExecutionContext)
+    extends BackendController(cc) {
 
   def pay(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
 
@@ -35,28 +40,43 @@ class StartPaymentController @Inject() (auditService: AuditService, cc: Controll
         .fold[Either[Seq[ThirdPartyResponseError], ThirdPartyPayRequest]](
           ifEmpty = Left(Seq(ThirdPartyResponseErrors.NonJsonBodyError))
         )(
-            f = validationService.validateThirdPartyRequest
-          )
+          f = validationService.validateThirdPartyRequest
+        )
 
     requestOrErrors match {
-      case Left(value) =>
-        auditService.auditInitiateJourneyResult(isSuccessful         = false, maybeErrors = Some(value.map(_.errorMessage)), rawJson = request.body.asJson, maybeClientJourneyId = None)
+      case Left(value)  =>
+        auditService.auditInitiateJourneyResult(
+          isSuccessful = false,
+          maybeErrors = Some(value.map(_.errorMessage)),
+          rawJson = request.body.asJson,
+          maybeClientJourneyId = None
+        )
         Future.successful(thirdPartyResponseErrorToResult(value))
       case Right(value) =>
         payApiService
           .startPaymentJourney(value)
           .map {
-            case Left(error) =>
-              auditService.auditInitiateJourneyResult(isSuccessful         = false, maybeErrors = Some(Seq(error.errorMessage)), rawJson = request.body.asJson, maybeClientJourneyId = None)
+            case Left(error)                  =>
+              auditService.auditInitiateJourneyResult(
+                isSuccessful = false,
+                maybeErrors = Some(Seq(error.errorMessage)),
+                rawJson = request.body.asJson,
+                maybeClientJourneyId = None
+              )
               thirdPartyResponseErrorToResult(Seq(error))
             case Right(thirdPartyPayResponse) =>
-              auditService.auditInitiateJourneyResult(isSuccessful         = true, maybeErrors = None, rawJson = request.body.asJson, maybeClientJourneyId = Some(thirdPartyPayResponse.clientJourneyId))
+              auditService.auditInitiateJourneyResult(
+                isSuccessful = true,
+                maybeErrors = None,
+                rawJson = request.body.asJson,
+                maybeClientJourneyId = Some(thirdPartyPayResponse.clientJourneyId)
+              )
               Created(Json.toJson(thirdPartyPayResponse))
           }
     }
   }
 
-  //Just return an Internal server error if any of the errors are related to that, else BadRequest with list of errors
+  // Just return an Internal server error if any of the errors are related to that, else BadRequest with list of errors
   def thirdPartyResponseErrorToResult(errors: Seq[ThirdPartyResponseError]): Result = {
     val maybeInternalServerError: Seq[ThirdPartyResponseError] = errors.collect {
       case e @ ThirdPartyResponseErrors.UnexpectedError(_) => e
@@ -68,6 +88,7 @@ class StartPaymentController @Inject() (auditService: AuditService, cc: Controll
       BadRequest(createErrorResponses(errors))
   }
 
-  private def createErrorResponses: Seq[ThirdPartyResponseError] => JsObject = e => Json.obj("errors" -> Json.toJson(e.map(_.errorMessage)))
+  private def createErrorResponses: Seq[ThirdPartyResponseError] => JsObject = e =>
+    Json.obj("errors" -> Json.toJson(e.map(_.errorMessage)))
 
 }

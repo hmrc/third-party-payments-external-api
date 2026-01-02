@@ -31,14 +31,19 @@ final class ValidationService {
       .leftMap(errors => jsErrorToMessagesBetter(errors).map(errorMessageKeyToThirdPartyResponseErrors))
   }
 
-  private[services] def jsErrorToMessagesBetter(errors: collection.Seq[(JsPath, collection.Seq[JsonValidationError])]): Seq[String] = {
-    errors.flatMap((e: (JsPath, collection.Seq[JsonValidationError])) => {
-      //i.e. the json key value, such as amountInPence
-      val path: String = e._1.toString().replaceAll("/", "")
-      //i.e. the list of errors associated with this jserror, such as amountInPence.error.path.missing
-      val errors: collection.Seq[String] = e._2.map(_.message)
-      errors.map((messages: String) => s"$path.$messages")
-    }).toSeq
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  private[services] def jsErrorToMessagesBetter(
+    errors: collection.Seq[(JsPath, collection.Seq[JsonValidationError])]
+  ): Seq[String] = {
+    errors
+      .flatMap[String]((e: (JsPath, collection.Seq[JsonValidationError])) => {
+        // i.e. the json key value, such as amountInPence
+        val path: String                   = e._1.toString().replaceAll("/", "")
+        // i.e. the list of errors associated with this jserror, such as amountInPence.error.path.missing
+        val errors: collection.Seq[String] = e._2.map(_.message)
+        errors.map[String]((messages: String) => s"$path.$messages")
+      })
+      .toSeq
   }
 
   private[services] def errorMessageKeyToThirdPartyResponseErrors: String => ThirdPartyResponseError = {

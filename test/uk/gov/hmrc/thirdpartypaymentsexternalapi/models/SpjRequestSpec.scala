@@ -27,22 +27,35 @@ class SpjRequestSpec extends UnitSpec {
   "SpjRequest" - {
 
     val testClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
-    val testReference = Reference("1234567895")
-    val testAmountInPence = AmountInPence(123)
-    val testFriendlyName = FriendlyName("Test Company")
-    val testUrl = URL("https://valid-url.com")
+    val testReference       = Reference("1234567895")
+    val testAmountInPence   = AmountInPence(123)
+    val testFriendlyName    = FriendlyName("Test Company")
+    val testUrl             = URL("https://valid-url.com")
 
     "SpjRequest3psSa" - {
 
-      val spjRequest = SpjRequest3psSa(testReference, testAmountInPence, testClientJourneyId, Some(testFriendlyName), Some(testUrl), Some(testUrl))
-      val jsValue = Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+      val spjRequest = SpjRequest3psSa(
+        testReference,
+        testAmountInPence,
+        testClientJourneyId,
+        Some(testFriendlyName),
+        Some(testUrl),
+        Some(testUrl)
+      )
+      val jsValue    = Json.parse(
+        """{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+      )
 
       "serialise to json with optional due date" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse(
+          """{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+        )
       }
 
       "serialise to json" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse(
+          """{"utr":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+        )
       }
 
       "de serialise from json" in {
@@ -52,14 +65,27 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psVat" - {
 
-      val spjRequest = SpjRequest3psVat(testReference, testAmountInPence, testClientJourneyId, Some(testFriendlyName), Some(testUrl), Some(testUrl))
-      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+      val spjRequest = SpjRequest3psVat(
+        testReference,
+        testAmountInPence,
+        testClientJourneyId,
+        Some(testFriendlyName),
+        Some(testUrl),
+        Some(testUrl)
+      )
+      val jsValue    = Json.parse(
+        """{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+      )
 
       "serialise to json with optional due date" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse(
+          """{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+        )
       }
       "serialise to json" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse(
+          """{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+        )
       }
 
       "de serialise from json with optional due date" in {
@@ -69,11 +95,22 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psCorporationTax" - {
 
-      val spjRequest = SpjRequest3psCorporationTax(testReference, testAmountInPence, testClientJourneyId, Some(testFriendlyName), Some(testUrl), Some(testUrl))
-      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+      val spjRequest = SpjRequest3psCorporationTax(
+        testReference,
+        testAmountInPence,
+        testClientJourneyId,
+        Some(testFriendlyName),
+        Some(testUrl),
+        Some(testUrl)
+      )
+      val jsValue    = Json.parse(
+        """{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+      )
 
       "serialise to json" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse(
+          """{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+        )
       }
 
       "de serialise from json" in {
@@ -83,11 +120,22 @@ class SpjRequestSpec extends UnitSpec {
 
     "SpjRequest3psEmployersPayAsYouEarn" - {
 
-      val spjRequest = SpjRequest3psEmployersPayAsYouEarn(testReference, testAmountInPence, testClientJourneyId, Some(testFriendlyName), Some(testUrl), Some(testUrl))
-      val jsValue = Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+      val spjRequest = SpjRequest3psEmployersPayAsYouEarn(
+        testReference,
+        testAmountInPence,
+        testClientJourneyId,
+        Some(testFriendlyName),
+        Some(testUrl),
+        Some(testUrl)
+      )
+      val jsValue    = Json.parse(
+        """{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+      )
 
       "serialise to json" in {
-        Json.toJson(spjRequest) shouldBe Json.parse("""{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}""")
+        Json.toJson(spjRequest) shouldBe Json.parse(
+          """{"vrn":"1234567895","amountInPence":123,"clientJourneyId":"aef0f31b-3c0f-454b-9d1f-07d549987a96","friendlyName":"Test Company","returnUrl":"https://valid-url.com","backUrl":"https://valid-url.com"}"""
+        )
       }
 
       "de serialise from json" in {

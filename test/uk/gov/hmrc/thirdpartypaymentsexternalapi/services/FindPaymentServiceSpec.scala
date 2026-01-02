@@ -26,6 +26,8 @@ import java.util.UUID
 
 class FindPaymentServiceSpec extends ItSpec {
 
+  given CanEqual[ThirdPartySoftwareFindByClientIdResponse, ThirdPartySoftwareFindByClientIdResponse] = CanEqual.derived
+
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val findPaymentService: FindPaymentService = app.injector.instanceOf[FindPaymentService]
@@ -35,7 +37,7 @@ class FindPaymentServiceSpec extends ItSpec {
 
     "findJourneyByClientId" - {
       "should return a ThirdPartySoftwareFindByClientIdResponse given open-banking call succeeds with taxRegime in PascalCase" in {
-        //TaxRegime is converted to PascalCase
+        // TaxRegime is converted to PascalCase
         val expectedResponse = ThirdPartySoftwareFindByClientIdResponse(clientId, "TaxRegime", 1234, "InProgress")
         OpenBankingStub.stubForFindJourneyByClientId(clientId)
 
@@ -49,7 +51,9 @@ class FindPaymentServiceSpec extends ItSpec {
 
         val error = intercept[Exception](findPaymentService.findJourneyByClientId(clientId).futureValue)
 
-        error.getCause.getMessage should include(s"GET of 'http://localhost:${wireMockPort.toString}/open-banking/payment/search/third-party-software/${clientId.value.toString}' returned 503.")
+        error.getCause.getMessage should include(
+          s"GET of 'http://localhost:${wireMockPort.toString}/open-banking/payment/search/third-party-software/${clientId.value.toString}' returned 503."
+        )
       }
     }
 

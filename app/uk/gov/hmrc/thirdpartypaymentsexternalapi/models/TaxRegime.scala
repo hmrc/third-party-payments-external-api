@@ -16,17 +16,17 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
-import enumeratum.{PlayJsonEnum, Enum, EnumEntry}
+import enumeratum.{Enum, EnumEntry, PlayJsonEnum}
 
-sealed trait TaxRegime extends EnumEntry
+sealed trait TaxRegime extends EnumEntry derives CanEqual
 
 object TaxRegime extends Enum[TaxRegime] with PlayJsonEnum[TaxRegime] {
 
   val values: IndexedSeq[TaxRegime] = findValues
 
-  case object SelfAssessment extends TaxRegime
-  case object Vat extends TaxRegime
-  case object CorporationTax extends TaxRegime
+  case object SelfAssessment        extends TaxRegime
+  case object Vat                   extends TaxRegime
+  case object CorporationTax        extends TaxRegime
   case object EmployersPayAsYouEarn extends TaxRegime
 
 }

@@ -68,9 +68,10 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
   }
 
   "GET /status when config allows external test" - {
-      def applicationBuilder: GuiceApplicationBuilder = super.applicationBuilder().configure(configMap ++ Map("external-test.testOnly-headers.enabled" -> true))
-    val app2 = applicationBuilder.build()
-    val findPaymentController = app2.injector.instanceOf[FindPaymentController]
+    def applicationBuilder: GuiceApplicationBuilder =
+      super.applicationBuilder().configure(configMap ++ Map("external-test.testOnly-headers.enabled" -> true))
+    val app2                                        = applicationBuilder.build()
+    val findPaymentController                       = app2.injector.instanceOf[FindPaymentController]
 
     "should return test data when a valid value is provided for the header \"Gov-Test-Scenario\"" - {
       val testCases = Table(
@@ -82,7 +83,8 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
 
       forAll(testCases) { (header, expectedReturnStatus) =>
         s"return 200 OK with and a status of $expectedReturnStatus when endpoint receives $header in the headers" in {
-          val result = findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", header)))
+          val result =
+            findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", header)))
 
           status(result) shouldBe Status.OK
           contentAsJson(result) shouldBe Json.parse(
@@ -97,13 +99,16 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
       }
 
       "should return a exception when the clientJourneyId is not found" in {
-        val result = findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", "xyz")))
+        val result =
+          findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", "xyz")))
 
         result.failed.futureValue shouldBe a[Exception]
       }
 
       "should return 500 InternalServerError when an exception is thrown" in {
-        val result = findPaymentController.status(clientJourneyId)(fakeRequest.withHeaders(("Gov-Test-Scenario", "UPSTREAM_ERROR")))
+        val result = findPaymentController.status(clientJourneyId)(
+          fakeRequest.withHeaders(("Gov-Test-Scenario", "UPSTREAM_ERROR"))
+        )
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }

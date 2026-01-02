@@ -24,6 +24,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.test.WireMockSupport
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.ClientJourneyIdGeneratorService
@@ -32,23 +33,24 @@ import java.util.UUID
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 
-trait ItSpec extends AnyFreeSpecLike
-  with GuiceOneServerPerSuite
-  with ScalaFutures
-  with IntegrationPatience
-  with WireMockSupport
-  with Matchers { self =>
+trait ItSpec
+    extends AnyFreeSpecLike
+    with GuiceOneServerPerSuite
+    with ScalaFutures
+    with IntegrationPatience
+    with WireMockSupport
+    with Matchers { self =>
 
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ec: ExecutionContext            = scala.concurrent.ExecutionContext.Implicits.global
   implicit lazy val materializer: Materializer = app.materializer
 
   protected lazy val configMap: Map[String, Any] = Map[String, Any](
-    "auditing.enabled" -> true,
-    "auditing.traceRequests" -> false,
-    "auditing.consumer.baseUri.port" -> self.wireMockPort,
-    "microservice.services.pay-api.port" -> self.wireMockPort,
+    "auditing.enabled"                        -> true,
+    "auditing.traceRequests"                  -> false,
+    "auditing.consumer.baseUri.port"          -> self.wireMockPort,
+    "microservice.services.pay-api.port"      -> self.wireMockPort,
     "microservice.services.open-banking.port" -> self.wireMockPort,
-    "internal-auth.token" -> "wowow"
+    "internal-auth.token"                     -> "wowow"
   )
 
   lazy val overridesModule: AbstractModule = new AbstractModule {
@@ -56,7 +58,9 @@ trait ItSpec extends AnyFreeSpecLike
     @Singleton
     @nowarn // silence "method never used" warning
     def staticClientJourneyIdGenerator(): ClientJourneyIdGeneratorService = new ClientJourneyIdGeneratorService {
-      override def nextClientJourneyId(): ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+      override def nextClientJourneyId(): ClientJourneyId = ClientJourneyId(
+        UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")
+      )
     }
   }
 
@@ -65,4 +69,7 @@ trait ItSpec extends AnyFreeSpecLike
     .overrides(GuiceableModule.fromGuiceModule(overridesModule))
 
   override def fakeApplication(): Application = applicationBuilder().build()
+  
+  // reusable CanEquals
+  given CanEqual[JsValue, JsValue] = CanEqual.derived
 }

@@ -28,28 +28,35 @@ import java.util.UUID
 class OpenBankingConnectorSpec extends ItSpec {
 
   val openBankingConnector: OpenBankingConnector = app.injector.instanceOf[OpenBankingConnector]
-  val clientId: ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+  val clientId: ClientJourneyId                  = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
 
   "OpenBankingConnector" - {
     "findJourneyByClientId" - {
-      //tried writing a test for no config but the test kept crashing
+      // tried writing a test for no config but the test kept crashing
       "should return a ThirdPartySoftwareFindByClientIdResponse given open-banking call succeeds when config is set" in {
-        //Set in Itspec
+        // Set in Itspec
         val expectedResponse = ThirdPartySoftwareFindByClientIdResponse(clientId, "taxRegime", 1234, "InProgress")
         OpenBankingStub.stubForFindJourneyByClientId(clientId)
 
-        val result = openBankingConnector.findJourneyByClientId(clientId)(HeaderCarrier())
+        val result = openBankingConnector.findJourneyByClientId(clientId)(using HeaderCarrier())
 
         result.futureValue shouldBe expectedResponse
-        verify(getRequestedFor(urlPathEqualTo("/open-banking/payment/search/third-party-software/aef0f31b-3c0f-454b-9d1f-07d549987a96"))
-          .withHeader("AUTHORIZATION", equalTo("wowow")))
+        verify(
+          getRequestedFor(
+            urlPathEqualTo("/open-banking/payment/search/third-party-software/aef0f31b-3c0f-454b-9d1f-07d549987a96")
+          )
+            .withHeader("AUTHORIZATION", equalTo("wowow"))
+        )
       }
 
       "should propagate a 5xx error when open-banking returns a 5xx" in {
         OpenBankingStub.stubForFindJourneyByClientId5xx()
 
-        val error = intercept[Exception](openBankingConnector.findJourneyByClientId(clientId)(HeaderCarrier()).futureValue)
-        error.getCause.getMessage should include(s"GET of 'http://localhost:${wireMockPort.toString}/open-banking/payment/search/third-party-software/${clientId.value.toString}' returned 503.")
+        val error =
+          intercept[Exception](openBankingConnector.findJourneyByClientId(clientId)(using HeaderCarrier()).futureValue)
+        error.getCause.getMessage should include(
+          s"GET of 'http://localhost:${wireMockPort.toString}/open-banking/payment/search/third-party-software/${clientId.value.toString}' returned 503."
+        )
       }
     }
 

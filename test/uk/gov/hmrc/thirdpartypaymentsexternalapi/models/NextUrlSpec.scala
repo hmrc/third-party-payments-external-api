@@ -28,7 +28,9 @@ class NextUrlSpec extends UnitSpec {
     }
 
     "de serialise from json" in {
-      Json.fromJson[NextUrl](JsString("https://www.some-url.com")).asEither shouldBe Right(NextUrl("https://www.some-url.com"))
+      Json.fromJson[NextUrl](JsString("https://www.some-url.com")).asEither shouldBe Right(
+        NextUrl("https://www.some-url.com")
+      )
     }
   }
 

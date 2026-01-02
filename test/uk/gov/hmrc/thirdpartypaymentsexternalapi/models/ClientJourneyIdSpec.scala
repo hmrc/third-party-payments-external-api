@@ -25,11 +25,15 @@ class ClientJourneyIdSpec extends UnitSpec {
 
   "ClientJourneyId" - {
     "serialise to json" in {
-      Json.toJson(ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))) shouldBe JsString("aef0f31b-3c0f-454b-9d1f-07d549987a96")
+      Json.toJson(ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))) shouldBe JsString(
+        "aef0f31b-3c0f-454b-9d1f-07d549987a96"
+      )
     }
 
     "de serialise from json" in {
-      Json.fromJson[ClientJourneyId](JsString("aef0f31b-3c0f-454b-9d1f-07d549987a96")).asEither shouldBe Right(ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")))
+      Json.fromJson[ClientJourneyId](JsString("aef0f31b-3c0f-454b-9d1f-07d549987a96")).asEither shouldBe Right(
+        ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+      )
     }
   }
 

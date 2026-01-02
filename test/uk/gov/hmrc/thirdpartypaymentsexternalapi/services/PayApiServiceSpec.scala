@@ -27,21 +27,23 @@ import java.util.UUID
 
 class PayApiServiceSpec extends ItSpec {
 
+  given CanEqual[ThirdPartyPayResponse, ThirdPartyPayResponse] = CanEqual.derived
+
   val payApiService: PayApiService = app.injector.instanceOf[PayApiService]
 
   implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   def thirdPartyPayRequest(taxRegime: TaxRegime): ThirdPartyPayRequest = ThirdPartyPayRequest(
-    taxRegime     = taxRegime,
-    reference     = Reference("someReference"),
+    taxRegime = taxRegime,
+    reference = Reference("someReference"),
     amountInPence = AmountInPence(123),
-    friendlyName  = Some(FriendlyName("Test Company")),
-    backURL       = Some(URL("https://valid-url.com"))
+    friendlyName = Some(FriendlyName("Test Company")),
+    backURL = Some(URL("https://valid-url.com"))
   )
 
   val testThirdPartyPayResponse: ThirdPartyPayResponse = ThirdPartyPayResponse(
     clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")),
-    redirectURL     = RedirectUrl("https://somenext-url.co.uk")
+    redirectURL = RedirectUrl("https://somenext-url.co.uk")
   )
 
   "PayApiService" - {
@@ -112,7 +114,9 @@ class PayApiServiceSpec extends ItSpec {
       "return a Left[UnexpectedError] when pay-api call fails due to some error that is not 4xx or 5xx" in {
         PayApiStub.stubForStartJourneySelfAssessment3xx()
         val result = payApiService.startPaymentJourney(thirdPartyPayRequest(SelfAssessment))
-        result.futureValue shouldBe Left(ThirdPartyResponseErrors.UnexpectedError("error when trying to start a journey upstream."))
+        result.futureValue shouldBe Left(
+          ThirdPartyResponseErrors.UnexpectedError("error when trying to start a journey upstream.")
+        )
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
     }

@@ -1,18 +1,21 @@
-import sbt.Keys._
+import sbt.Keys.*
 import play.sbt.routes.RoutesKeys.routes
-import sbt._
+import sbt.*
 import wartremover.Wart
-import wartremover.WartRemover.autoImport._
+import wartremover.WartRemover.autoImport.*
 
 object WartRemoverSettings {
+
   val wartRemoverSettings =
     Seq(
       (Compile / compile / wartremoverErrors) ++= {
         if (StrictBuilding.strictBuilding.value) {
           Warts.allBut(
+            Wart.Equals,
             Wart.DefaultArguments,
             Wart.ImplicitParameter,
             Wart.Nothing,
+            Wart.StringPlusAny,
             Wart.Throw,
             Wart.ToString,
             Wart.PlatformDefault
@@ -26,7 +29,6 @@ object WartRemoverSettings {
         Wart.NonUnitStatements,
         Wart.PublicInference
       ),
-      wartremoverExcluded ++= (Compile / routes).value ++
-        target.value.get // stops a weird wart remover Null error being thrown, we don't care about target directory
+      wartremoverExcluded ++= (Compile / routes).value
     )
 }

@@ -18,9 +18,9 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
 import java.util.UUID
 
-import play.api.libs.json.{Json, Format}
+import play.api.libs.json.{Format, Json}
 
-final case class ClientJourneyId(value: UUID) extends AnyVal
+final case class ClientJourneyId(value: UUID) extends AnyVal derives CanEqual
 
 object ClientJourneyId {
   implicit val format: Format[ClientJourneyId] = Json.valueFormat[ClientJourneyId]

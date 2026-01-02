@@ -15,7 +15,7 @@ object CodeCoverageSettings {
     "uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers.DocumentationController"
   )
 
-  val settings: Seq[Setting[_]] = Seq(
+  val settings: Seq[Setting[?]] = Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 100,
     ScoverageKeys.coverageFailOnMinimum := false,

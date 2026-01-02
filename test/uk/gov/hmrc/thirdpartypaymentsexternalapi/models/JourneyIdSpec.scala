@@ -24,11 +24,15 @@ class JourneyIdSpec extends UnitSpec {
 
   "JourneyId" - {
     "serialise to json" in {
-      Json.toJson(JourneyId("aef0f31b-3c0f-454b-9d1f-07d549987a96")) shouldBe JsString("aef0f31b-3c0f-454b-9d1f-07d549987a96")
+      Json.toJson(JourneyId("aef0f31b-3c0f-454b-9d1f-07d549987a96")) shouldBe JsString(
+        "aef0f31b-3c0f-454b-9d1f-07d549987a96"
+      )
     }
 
     "de serialise from json" in {
-      Json.fromJson[JourneyId](JsString("aef0f31b-3c0f-454b-9d1f-07d549987a96")).asEither shouldBe Right(JourneyId("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+      Json.fromJson[JourneyId](JsString("aef0f31b-3c0f-454b-9d1f-07d549987a96")).asEither shouldBe Right(
+        JourneyId("aef0f31b-3c0f-454b-9d1f-07d549987a96")
+      )
     }
   }
 

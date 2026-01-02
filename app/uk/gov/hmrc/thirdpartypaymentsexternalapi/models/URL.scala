@@ -25,12 +25,15 @@ final case class URL(value: String) extends AnyVal
 
 object URL {
 
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   private val validUrlReads: Reads[URL] =
-    JsPath.read[String](
-      filterNot[String](JsonValidationError("error.invalidUrl")) { url => Try(new java.net.URI(url).toURL).isFailure }
-    ).map(URL(_))
+    JsPath
+      .read[String](
+        using filterNot[String](JsonValidationError("error.invalidUrl")) { (url: String) => Try(new java.net.URI(url).toURL).isFailure }
+      )
+      .map(URL(_))
 
-  val reads: Reads[URL] = validUrlReads
-  val writes: Writes[URL] = Json.valueWrites[URL]
-  implicit val urlFormat: Format[URL] = Format[URL](reads, writes)
+  val reads: Reads[URL]               = validUrlReads
+  val writes: Writes[URL]             = Json.valueWrites[URL]
+  given urlFormat: Format[URL] = Format[URL](reads, writes)
 }

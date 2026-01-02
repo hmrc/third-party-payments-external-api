@@ -20,14 +20,14 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 
 final case class ThirdPartySoftwareFindByClientIdResponse(
-    clientJourneyId: ClientJourneyId,
-    taxRegime:       String,
-    amountInPence:   Long,
-    paymentStatus:   String
-)
+  clientJourneyId: ClientJourneyId,
+  taxRegime:       String,
+  amountInPence:   Long,
+  paymentStatus:   String
+) derives CanEqual
 
 object ThirdPartySoftwareFindByClientIdResponse {
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
-  implicit val format: Format[ThirdPartySoftwareFindByClientIdResponse] = Json.format[ThirdPartySoftwareFindByClientIdResponse]
+  implicit val format: Format[ThirdPartySoftwareFindByClientIdResponse] =
+    Json.format[ThirdPartySoftwareFindByClientIdResponse]
 }
-

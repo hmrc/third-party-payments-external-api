@@ -29,48 +29,51 @@ import scala.concurrent.ExecutionContext
 class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
 
   def auditInitiateJourneyResult(
-      isSuccessful:         Boolean,
-      maybeErrors:          Option[Seq[String]],
-      rawJson:              Option[JsValue],
-      maybeClientJourneyId: Option[ClientJourneyId]
+    isSuccessful:         Boolean,
+    maybeErrors:          Option[Seq[String]],
+    rawJson:              Option[JsValue],
+    maybeClientJourneyId: Option[ClientJourneyId]
   )(implicit hc: HeaderCarrier): Unit = {
     val auditDetails = toInitiateAuditDetail(
-      isSuccessful         = isSuccessful,
-      maybeErrors          = maybeErrors,
-      rawJson              = rawJson,
+      isSuccessful = isSuccessful,
+      maybeErrors = maybeErrors,
+      rawJson = rawJson,
       maybeClientJourneyId = maybeClientJourneyId
     )
     auditConnector.sendExplicitAudit[InitiateJourneyAuditDetail](auditDetails.auditType, auditDetails)
   }
 
   private def toInitiateAuditDetail(
-      isSuccessful:         Boolean,
-      maybeErrors:          Option[Seq[String]],
-      rawJson:              Option[JsValue],
-      maybeClientJourneyId: Option[ClientJourneyId]
+    isSuccessful:         Boolean,
+    maybeErrors:          Option[Seq[String]],
+    rawJson:              Option[JsValue],
+    maybeClientJourneyId: Option[ClientJourneyId]
   ): InitiateJourneyAuditDetail = {
 
-    val referenceJsPath: JsPath = __ \ "reference"
+    val referenceJsPath: JsPath     = __ \ "reference"
     val amountInPenceJsPath: JsPath = __ \ "amountInPence"
-    val friendlyNameJsPath: JsPath = __ \ "friendlyName"
-    val taxRegimeJsPath: JsPath = __ \ "taxRegime"
+    val friendlyNameJsPath: JsPath  = __ \ "friendlyName"
+    val taxRegimeJsPath: JsPath     = __ \ "taxRegime"
 
-    val maybeTaxRegime = rawJson.flatMap(json => maybeValueFromJson[JsString](json, taxRegimeJsPath).map(_.value))
-    val maybePaymentReference = rawJson.flatMap(json => maybeValueFromJson[JsString](json, referenceJsPath).map(_.value))
-    val maybeAmount = rawJson.flatMap(json => maybeValueFromJson[JsNumber](json, amountInPenceJsPath).map(_.value))
-    val maybeOriginOfRequest = rawJson.flatMap(json => maybeValueFromJson[JsString](json, friendlyNameJsPath).map(_.value))
+    val maybeTaxRegime        = rawJson.flatMap(json => maybeValueFromJson[JsString](json, taxRegimeJsPath).map(_.value))
+    val maybePaymentReference =
+      rawJson.flatMap(json => maybeValueFromJson[JsString](json, referenceJsPath).map(_.value))
+    val maybeAmount           = rawJson.flatMap(json => maybeValueFromJson[JsNumber](json, amountInPenceJsPath).map(_.value))
+    val maybeOriginOfRequest  =
+      rawJson.flatMap(json => maybeValueFromJson[JsString](json, friendlyNameJsPath).map(_.value))
 
     InitiateJourneyAuditDetail(
-      outcome          = Outcome(isSuccessful, maybeErrors),
-      taxRegime        = maybeTaxRegime,
+      outcome = Outcome(isSuccessful, maybeErrors),
+      taxRegime = maybeTaxRegime,
       paymentReference = maybePaymentReference,
-      amount           = maybeAmount.map(_./(100)),
-      originOfRequest  = maybeOriginOfRequest,
-      clientJourneyId  = maybeClientJourneyId.map(_.value.toString),
+      amount = maybeAmount.map(_./(100)),
+      originOfRequest = maybeOriginOfRequest,
+      clientJourneyId = maybeClientJourneyId.map(_.value.toString)
     )
 
   }
 
-  private def maybeValueFromJson[A <: JsValue](jsValue: JsValue, pathExtractor: JsPath)(implicit reads: Reads[A]): Option[A] = jsValue.validate(pathExtractor.json.pick[A]).asOpt
+  private def maybeValueFromJson[A <: JsValue](jsValue: JsValue, pathExtractor: JsPath)(using reads: Reads[A]): Option[A] =
+    jsValue.validate(using pathExtractor.json.pick[A]).asOpt
 
 }

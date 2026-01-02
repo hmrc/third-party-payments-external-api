@@ -33,17 +33,18 @@ class AuditServiceSpec extends ItSpec {
   "AuditService" - {
 
     "should successfully send audit when the journey is not successful and Null values" in {
-      val isSuccessful = false
-      val maybeErrors: Option[Seq[String]] = Some(Seq("I am an error"))
-      val rawJson: Option[JsValue] = Some(Json.obj())
+      val isSuccessful                                  = false
+      val maybeErrors: Option[Seq[String]]              = Some(Seq("I am an error"))
+      val rawJson: Option[JsValue]                      = Some(Json.obj())
       val maybeClientJourneyId: Option[ClientJourneyId] = None
 
       auditService.auditInitiateJourneyResult(isSuccessful, maybeErrors, rawJson, maybeClientJourneyId)
 
       AuditConnectorStub.verifyEventAudited(
         "InitiateJourney",
-        Json.parse(
-          s"""
+        Json
+          .parse(
+            s"""
              |{
              |  "outcome" : {
              |      "isSuccessful" : ${isSuccessful.toString},
@@ -51,27 +52,32 @@ class AuditServiceSpec extends ItSpec {
              |    }
              |}
              |""".stripMargin
-        ).as[JsObject]
+          )
+          .as[JsObject]
       )
     }
 
     "should successfully send audit when the journey is successful" in {
-      val isSuccessful = true
-      val maybeErrors: Option[Seq[String]] = None
-      val rawJson: Option[JsValue] = Some(Json.obj(
-        "reference" -> "abcd",
-        "amountInPence" -> 123,
-        "friendlyName" -> "Test Company",
-        "taxRegime" -> "SelfAssessment"
-      ))
-      val maybeClientJourneyId: Option[ClientJourneyId] = Some(ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")))
+      val isSuccessful                                  = true
+      val maybeErrors: Option[Seq[String]]              = None
+      val rawJson: Option[JsValue]                      = Some(
+        Json.obj(
+          "reference"     -> "abcd",
+          "amountInPence" -> 123,
+          "friendlyName"  -> "Test Company",
+          "taxRegime"     -> "SelfAssessment"
+        )
+      )
+      val maybeClientJourneyId: Option[ClientJourneyId] =
+        Some(ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96")))
 
       auditService.auditInitiateJourneyResult(isSuccessful, maybeErrors, rawJson, maybeClientJourneyId)
 
       AuditConnectorStub.verifyEventAudited(
         "InitiateJourney",
-        Json.parse(
-          s"""
+        Json
+          .parse(
+            s"""
              |{
              |  "outcome" : {
              |      "isSuccessful" : ${isSuccessful.toString}
@@ -83,7 +89,8 @@ class AuditServiceSpec extends ItSpec {
              |    "clientJourneyId" : "aef0f31b-3c0f-454b-9d1f-07d549987a96"
              |}
              |""".stripMargin
-        ).as[JsObject]
+          )
+          .as[JsObject]
       )
 
     }

@@ -18,10 +18,12 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
 import org.scalatest.AppendedClues.convertToClueful
 import org.scalatest.Assertion
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.{JsString, Json, JsValue}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
 class TaxRegimeSpec extends UnitSpec {
+
+  given CanEqual[JsValue, JsString] = CanEqual.derived
 
   "TaxRegime" - {
     "serialise to json" in {
@@ -37,10 +39,13 @@ class TaxRegimeSpec extends UnitSpec {
       Json.fromJson[TaxRegime](JsString("SelfAssessment")).asEither shouldBe Right(TaxRegime.SelfAssessment)
       Json.fromJson[TaxRegime](JsString("Vat")).asEither shouldBe Right(TaxRegime.Vat)
       Json.fromJson[TaxRegime](JsString("CorporationTax")).asEither shouldBe Right(TaxRegime.CorporationTax)
-      Json.fromJson[TaxRegime](JsString("EmployersPayAsYouEarn")).asEither shouldBe Right(TaxRegime.EmployersPayAsYouEarn)
+      Json.fromJson[TaxRegime](JsString("EmployersPayAsYouEarn")).asEither shouldBe Right(
+        TaxRegime.EmployersPayAsYouEarn
+      )
     }
   }
 
-  private def checkAllRegimesCovered: Assertion = TaxRegime.values.size shouldBe 4 withClue "Has a tax regime been added but not had the tests updated?"
+  private def checkAllRegimesCovered: Assertion =
+    TaxRegime.values.size shouldBe 4 withClue "Has a tax regime been added but not had the tests updated?"
 
 }

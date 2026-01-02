@@ -23,10 +23,15 @@ import play.api.libs.json._
 final case class FriendlyName(value: String) extends AnyVal
 
 object FriendlyName {
-  private val invalidCharacterReads: Reads[FriendlyName] = JsPath.read[FriendlyName](pattern("""^[0-9a-zA-Z&@£$€¥#.,:;\s-]+$""".r, "error.invalidCharacters").map(FriendlyName(_)))
-  private val tooLongReads: Reads[String] = JsPath.read[String](filterNot[String](JsonValidationError("error.maxLength"))(_.length > 40))
+  private val invalidCharacterReads: Reads[FriendlyName] = JsPath.read[FriendlyName](
+    using pattern("""^[0-9a-zA-Z&@£$€¥#.,:;\s-]+$""".r, "error.invalidCharacters").map(FriendlyName(_))
+  )
 
-  val reads: Reads[FriendlyName] = invalidCharacterReads <~ tooLongReads
-  val writes: Writes[FriendlyName] = Json.valueWrites[FriendlyName]
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  private val tooLongReads: Reads[String]                =
+    JsPath.read[String](using filterNot[String](JsonValidationError("error.maxLength"))(_.length > 40))
+
+  val reads: Reads[FriendlyName]                        = invalidCharacterReads <~ tooLongReads
+  val writes: Writes[FriendlyName]                      = Json.valueWrites[FriendlyName]
   implicit val friendlyNameFormat: Format[FriendlyName] = Format[FriendlyName](reads, writes)
 }

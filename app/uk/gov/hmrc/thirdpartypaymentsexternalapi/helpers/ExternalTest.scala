@@ -25,16 +25,16 @@ import scala.concurrent.Future
 object ExternalTest {
 
   def newPaymentJourney(
-      clientJourneyId: ClientJourneyId,
-      header:          String
+    clientJourneyId: ClientJourneyId,
+    header:          String
   ): Future[ThirdPartySoftwareFindByClientIdResponse] = {
-      def expectedResponse(paymentStatus: String) =
-        ThirdPartySoftwareFindByClientIdResponse(
-          clientJourneyId = clientJourneyId,
-          taxRegime       = "taxRegime",
-          amountInPence   = 123456L,
-          paymentStatus   = paymentStatus
-        )
+    def expectedResponse(paymentStatus: String) =
+      ThirdPartySoftwareFindByClientIdResponse(
+        clientJourneyId = clientJourneyId,
+        taxRegime = "taxRegime",
+        amountInPence = 123456L,
+        paymentStatus = paymentStatus
+      )
 
     header match {
       case "IN_PROGRESS"    => Future.successful(expectedResponse("InProgress"))

@@ -22,9 +22,13 @@ import play.api.libs.json._
 final case class Reference(value: String) extends AnyVal
 
 object Reference {
-  private val tooShortReads: Reads[Reference] = JsPath.read[Reference](filterNot[String](JsonValidationError("error.minLength"))(s => s.isBlank || s.length < 1).map(Reference(_)))
 
-  val reads: Reads[Reference] = tooShortReads
-  val writes: Writes[Reference] = Json.valueWrites[Reference]
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  private val tooShortReads: Reads[Reference] = JsPath.read[Reference](
+    using filterNot[String](JsonValidationError("error.minLength"))(s => s.isBlank || s.length < 1).map(Reference(_))
+  )
+
+  val reads: Reads[Reference]                     = tooShortReads
+  val writes: Writes[Reference]                   = Json.valueWrites[Reference]
   implicit val referenceFormat: Format[Reference] = Format[Reference](reads, writes)
 }

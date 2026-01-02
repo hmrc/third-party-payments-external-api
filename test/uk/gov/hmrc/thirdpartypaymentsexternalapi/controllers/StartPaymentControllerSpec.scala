@@ -33,22 +33,34 @@ class StartPaymentControllerSpec extends ItSpec {
 
   private val startPaymentController = app.injector.instanceOf[StartPaymentController]
 
-  private def testThirdPartyRequest(taxRegime: TaxRegime, reference: Reference, amountInPence: AmountInPence, friendlyName: Option[FriendlyName], backURL: Option[URL]): ThirdPartyPayRequest = ThirdPartyPayRequest(
-    taxRegime     = taxRegime,
-    reference     = reference,
+  private def testThirdPartyRequest(
+    taxRegime:     TaxRegime,
+    reference:     Reference,
+    amountInPence: AmountInPence,
+    friendlyName:  Option[FriendlyName],
+    backURL:       Option[URL]
+  ): ThirdPartyPayRequest = ThirdPartyPayRequest(
+    taxRegime = taxRegime,
+    reference = reference,
     amountInPence = amountInPence,
-    friendlyName  = friendlyName,
-    backURL       = backURL
+    friendlyName = friendlyName,
+    backURL = backURL
   )
 
-  private def auditJson(taxRegime: String, clientJourneyId: Option[ClientJourneyId], errorMessages: Option[String]): JsObject = {
+  private def auditJson(
+    taxRegime:       String,
+    clientJourneyId: Option[ClientJourneyId],
+    errorMessages:   Option[String]
+  ): JsObject = {
 
-    val maybeClientJourneyId: String = clientJourneyId.fold("")(id => s""", "clientJourneyId": "${id.value.toString}" """)
-    val maybeErrorMessages: String = errorMessages.fold("")(message => s""", "errorMessages": ["$message"] """)
-    val isSuccessful: String = errorMessages.isEmpty.toString
+    val maybeClientJourneyId: String =
+      clientJourneyId.fold("")(id => s""", "clientJourneyId": "${id.value.toString}" """)
+    val maybeErrorMessages: String   = errorMessages.fold("")(message => s""", "errorMessages": ["$message"] """)
+    val isSuccessful: String         = errorMessages.isEmpty.toString
 
-    Json.parse(
-      s"""
+    Json
+      .parse(
+        s"""
         |{
         |  "outcome" : {
         |      "isSuccessful" : ${isSuccessful}
@@ -60,20 +72,24 @@ class StartPaymentControllerSpec extends ItSpec {
         |    ${maybeClientJourneyId}
         |}
         |""".stripMargin
-    ).as[JsObject]
+      )
+      .as[JsObject]
   }
 
-  private val clientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
-  private val expectedTestThirdPartyPayResponse = ThirdPartyPayResponse(clientJourneyId, RedirectUrl("https://somenext-url.co.uk"))
+  private val clientJourneyId                   = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+  private val expectedTestThirdPartyPayResponse =
+    ThirdPartyPayResponse(clientJourneyId, RedirectUrl("https://somenext-url.co.uk"))
 
   private def fakeRequest(
-      taxRegime:     TaxRegime,
-      reference:     Reference            = Reference("1234567895"),
-      amountInPence: AmountInPence        = AmountInPence(123),
-      friendlyName:  Option[FriendlyName] = None,
-      backURL:       Option[URL]          = None
+    taxRegime:     TaxRegime,
+    reference:     Reference = Reference("1234567895"),
+    amountInPence: AmountInPence = AmountInPence(123),
+    friendlyName:  Option[FriendlyName] = None,
+    backURL:       Option[URL] = None
   ): FakeRequest[AnyContentAsJson] =
-    FakeRequest("POST", "/pay").withJsonBody(Json.toJson(testThirdPartyRequest(taxRegime, reference, amountInPence, friendlyName, backURL)))
+    FakeRequest("POST", "/pay").withJsonBody(
+      Json.toJson(testThirdPartyRequest(taxRegime, reference, amountInPence, friendlyName, backURL))
+    )
 
   "POST /pay" - {
 
@@ -84,7 +100,10 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(SelfAssessment))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("SelfAssessment", Some(clientJourneyId), None))
+        AuditConnectorStub.verifyEventAudited(
+          "InitiateJourney",
+          auditJson("SelfAssessment", Some(clientJourneyId), None)
+        )
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
 
@@ -102,7 +121,10 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(CorporationTax))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("CorporationTax", Some(clientJourneyId), None))
+        AuditConnectorStub.verifyEventAudited(
+          "InitiateJourney",
+          auditJson("CorporationTax", Some(clientJourneyId), None)
+        )
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
 
@@ -111,7 +133,10 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("EmployersPayAsYouEarn", Some(clientJourneyId), None))
+        AuditConnectorStub.verifyEventAudited(
+          "InitiateJourney",
+          auditJson("EmployersPayAsYouEarn", Some(clientJourneyId), None)
+        )
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
     }
@@ -123,7 +148,10 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(SelfAssessment))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("SelfAssessment", None, Some("Error from upstream.")))
+        AuditConnectorStub.verifyEventAudited(
+          "InitiateJourney",
+          auditJson("SelfAssessment", None, Some("Error from upstream."))
+        )
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
 
@@ -141,7 +169,10 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(CorporationTax))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("CorporationTax", None, Some("Error from upstream.")))
+        AuditConnectorStub.verifyEventAudited(
+          "InitiateJourney",
+          auditJson("CorporationTax", None, Some("Error from upstream."))
+        )
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
 
@@ -150,7 +181,10 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("EmployersPayAsYouEarn", None, Some("Error from upstream.")))
+        AuditConnectorStub.verifyEventAudited(
+          "InitiateJourney",
+          auditJson("EmployersPayAsYouEarn", None, Some("Error from upstream."))
+        )
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
     }
@@ -162,13 +196,15 @@ class StartPaymentControllerSpec extends ItSpec {
     }
 
     "return an BadRequest with all three mandatory fields in error message when they aren't provided" in {
-      val result = startPaymentController.pay()(FakeRequest().withJsonBody(Json.parse("""{"IamValidJson":"butnotmatchingthemodel"}""")))
+      val result = startPaymentController.pay()(
+        FakeRequest().withJsonBody(Json.parse("""{"IamValidJson":"butnotmatchingthemodel"}"""))
+      )
       status(result) shouldBe Status.BAD_REQUEST
       contentAsJson(result) shouldBe Json.parse("""{
                                                   |  "errors": [
                                                   |    "Mandatory amountInPence field missing.",
-                                                  |    "Mandatory taxRegime field missing.",
-                                                  |    "Mandatory reference field missing."
+                                                  |    "Mandatory reference field missing.",
+                                                  |    "Mandatory taxRegime field missing."
                                                   |  ]
                                                   |}""".stripMargin)
     }
@@ -177,14 +213,18 @@ class StartPaymentControllerSpec extends ItSpec {
       "friendly name" - {
         "is too long (more than 40 characters)" in {
           val stringMoreThan40Characters = "IamMoreThan40Characters123456789123456789"
-          val result = startPaymentController.pay()(fakeRequest(SelfAssessment, friendlyName = Some(FriendlyName(stringMoreThan40Characters))))
+          val result                     = startPaymentController.pay()(
+            fakeRequest(SelfAssessment, friendlyName = Some(FriendlyName(stringMoreThan40Characters)))
+          )
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["friendlyName field too long."]}""")
         }
 
         "contains invalid characters " in {
           val stringContainingInvalidCharacter = "invalidcharinthisstring%"
-          val result = startPaymentController.pay()(fakeRequest(SelfAssessment, friendlyName = Some(FriendlyName(stringContainingInvalidCharacter))))
+          val result                           = startPaymentController.pay()(
+            fakeRequest(SelfAssessment, friendlyName = Some(FriendlyName(stringContainingInvalidCharacter)))
+          )
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["friendlyName field contains invalid character."]}""")
         }
@@ -193,13 +233,27 @@ class StartPaymentControllerSpec extends ItSpec {
       "taxRegime" - {
         "is not in the enum" in {
           val regimeNotInEnum = "IamNotARealRegime"
-          val result = startPaymentController.pay()(FakeRequest().withJsonBody(Json.parse(s"""{"taxRegime":"$regimeNotInEnum","reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"https://valid-url.com"}""")))
+          val result          = startPaymentController.pay()(
+            FakeRequest().withJsonBody(
+              Json.parse(
+                s"""{"taxRegime":"$regimeNotInEnum","reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"https://valid-url.com"}"""
+              )
+            )
+          )
           status(result) shouldBe Status.BAD_REQUEST
-          contentAsJson(result) shouldBe Json.parse("""{"errors":["Mandatory taxRegime is not in list of acceptable values."]}""")
+          contentAsJson(result) shouldBe Json.parse(
+            """{"errors":["Mandatory taxRegime is not in list of acceptable values."]}"""
+          )
         }
 
         "is missing" in {
-          val result = startPaymentController.pay()(FakeRequest().withJsonBody(Json.parse(s"""{"reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"https://valid-url.com"}""")))
+          val result = startPaymentController.pay()(
+            FakeRequest().withJsonBody(
+              Json.parse(
+                s"""{"reference":"someReference","amountInPence":123,"friendlyName":"Test Company","backURL":"https://valid-url.com"}"""
+              )
+            )
+          )
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["Mandatory taxRegime field missing."]}""")
         }
@@ -208,13 +262,19 @@ class StartPaymentControllerSpec extends ItSpec {
       "reference" - {
         "is provided, but not enough characters" in {
           val emptyReference = Reference("")
-          val result = startPaymentController.pay()(fakeRequest(SelfAssessment, reference = emptyReference))
+          val result         = startPaymentController.pay()(fakeRequest(SelfAssessment, reference = emptyReference))
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["Mandatory reference field invalid."]}""")
         }
 
         "is missing" in {
-          val result = startPaymentController.pay()(FakeRequest().withJsonBody(Json.parse(s"""{"taxRegime":"SelfAssessment","amountInPence":123,"friendlyName":"Test Company","backURL":"https://valid-url.com"}""")))
+          val result = startPaymentController.pay()(
+            FakeRequest().withJsonBody(
+              Json.parse(
+                s"""{"taxRegime":"SelfAssessment","amountInPence":123,"friendlyName":"Test Company","backURL":"https://valid-url.com"}"""
+              )
+            )
+          )
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["Mandatory reference field missing."]}""")
         }
@@ -222,23 +282,31 @@ class StartPaymentControllerSpec extends ItSpec {
 
       "amountInPence" - {
         "is missing" in {
-          val result = startPaymentController.pay()(FakeRequest().withJsonBody(Json.parse(s"""{"taxRegime":"SelfAssessment","reference":"1234567895","friendlyName":"Test Company","backURL":"https://valid-url.com"}""")))
+          val result = startPaymentController.pay()(
+            FakeRequest().withJsonBody(
+              Json.parse(
+                s"""{"taxRegime":"SelfAssessment","reference":"1234567895","friendlyName":"Test Company","backURL":"https://valid-url.com"}"""
+              )
+            )
+          )
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["Mandatory amountInPence field missing."]}""")
         }
 
         "is less than the minimum allowed value (less than 0)" in {
           val negativeAmount = AmountInPence(-1)
-          val result = startPaymentController.pay()(fakeRequest(SelfAssessment, amountInPence = negativeAmount))
+          val result         = startPaymentController.pay()(fakeRequest(SelfAssessment, amountInPence = negativeAmount))
           status(result) shouldBe Status.BAD_REQUEST
-          contentAsJson(result) shouldBe Json.parse("""{"errors":["Mandatory amountInPence field must be greater than or equal to 0."]}""")
+          contentAsJson(result) shouldBe Json.parse(
+            """{"errors":["Mandatory amountInPence field must be greater than or equal to 0."]}"""
+          )
         }
       }
 
       "backURL" - {
         "is not a valid url" in {
           val invalidUrl = URL("notavalidurl")
-          val result = startPaymentController.pay()(fakeRequest(SelfAssessment, backURL = Some(invalidUrl)))
+          val result     = startPaymentController.pay()(fakeRequest(SelfAssessment, backURL = Some(invalidUrl)))
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["backURL field must be a valid url if provided."]}""")
         }
@@ -248,7 +316,9 @@ class StartPaymentControllerSpec extends ItSpec {
   }
 
   "thirdPartyResponseErrorToResult should throw an InternalServer error when given a ThirdPartyResponseErrors.UnexpectedError(_)" in {
-    val result: Result = startPaymentController.thirdPartyResponseErrorToResult(Seq(ThirdPartyResponseErrors.UnexpectedError("some reason")))
+    val result: Result = startPaymentController.thirdPartyResponseErrorToResult(
+      Seq(ThirdPartyResponseErrors.UnexpectedError("some reason"))
+    )
     result.header.status shouldBe Results.InternalServerError.header.status
   }
 
