@@ -17,6 +17,7 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import play.api.Logging
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors.PayApiConnector
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
@@ -30,7 +31,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class PayApiService @Inject() (
   payApiConnector:                 PayApiConnector,
   clientJourneyIdGeneratorService: ClientJourneyIdGeneratorService
-)(implicit executionContext: ExecutionContext) extends Logging {
+)(implicit executionContext: ExecutionContext)
+    extends Logging {
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
   def startPaymentJourney(

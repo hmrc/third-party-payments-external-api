@@ -24,8 +24,8 @@ final case class Reference(value: String) extends AnyVal
 object Reference {
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
-  private val tooShortReads: Reads[Reference] = JsPath.read[Reference](
-    using filterNot[String](JsonValidationError("error.minLength"))(s => s.isBlank || s.length < 1).map(Reference(_))
+  private val tooShortReads: Reads[Reference] = JsPath.read[Reference](using
+    filterNot[String](JsonValidationError("error.minLength"))(s => s.isBlank || s.length < 1).map(Reference(_))
   )
 
   val reads: Reads[Reference]                     = tooShortReads

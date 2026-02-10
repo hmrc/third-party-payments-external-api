@@ -135,7 +135,9 @@ class PayApiConnectorSpec extends ItSpec {
 
         val expectedResult: SpjResponse = PayApiTestData.spjResponse
         val result: Future[SpjResponse] =
-          payApiConnector.startEmployersPayAsYouEarnJourney(testSpjRequest3psEmployersPayAsYouEarn)(using HeaderCarrier())
+          payApiConnector.startEmployersPayAsYouEarnJourney(testSpjRequest3psEmployersPayAsYouEarn)(using
+            HeaderCarrier()
+          )
 
         result.futureValue shouldBe expectedResult
       }

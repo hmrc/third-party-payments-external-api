@@ -73,7 +73,9 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
 
   }
 
-  private def maybeValueFromJson[A <: JsValue](jsValue: JsValue, pathExtractor: JsPath)(using reads: Reads[A]): Option[A] =
+  private def maybeValueFromJson[A <: JsValue](jsValue: JsValue, pathExtractor: JsPath)(using
+    reads: Reads[A]
+  ): Option[A] =
     jsValue.validate(using pathExtractor.json.pick[A]).asOpt
 
 }

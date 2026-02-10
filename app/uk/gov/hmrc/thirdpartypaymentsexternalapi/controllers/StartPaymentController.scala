@@ -15,8 +15,9 @@
  */
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
-import play.api.libs.json._
-import play.api.mvc._
+import play.api.Logging
+import play.api.libs.json.*
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.{AuditService, PayApiService, ValidationService}
@@ -31,9 +32,13 @@ class StartPaymentController @Inject() (
   payApiService:     PayApiService,
   validationService: ValidationService
 )(implicit executionContext: ExecutionContext)
-    extends BackendController(cc) {
+    extends BackendController(cc)
+    with Logging {
 
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   def pay(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+
+    logger.debug(s"Request body to /pay: ${request.body.asJson.map(Json.prettyPrint).toString}")
 
     val requestOrErrors: Either[Seq[ThirdPartyResponseError], ThirdPartyPayRequest] =
       request.body.asJson

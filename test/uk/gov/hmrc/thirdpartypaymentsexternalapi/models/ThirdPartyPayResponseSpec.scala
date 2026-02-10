@@ -25,7 +25,7 @@ import java.util.UUID
 class ThirdPartyPayResponseSpec extends UnitSpec {
 
   given CanEqual[ThirdPartyPayResponse, ThirdPartyPayResponse] = CanEqual.derived
-  given CanEqual[Either[?, ?], Either[?,?]] = CanEqual.derived
+  given CanEqual[Either[?, ?], Either[?, ?]]                   = CanEqual.derived
 
   "ThirdPartyPayResponse" - {
 

@@ -26,7 +26,7 @@ import java.util.UUID
 
 class ThirdPartyPayRequestSpec extends UnitSpec {
 
-  given CanEqual[JsResult[?], JsError] = CanEqual.derived
+  given CanEqual[JsResult[?], JsError]     = CanEqual.derived
   given CanEqual[JsResult[?], JsResult[?]] = CanEqual.derived
 
   "ThirdPartyPayRequest" - {
