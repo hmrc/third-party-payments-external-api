@@ -17,7 +17,6 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
 import play.api.Logging
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.connectors.PayApiConnector
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi.SpjResponse
