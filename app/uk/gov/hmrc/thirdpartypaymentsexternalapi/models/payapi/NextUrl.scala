@@ -18,7 +18,7 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models.payapi
 
 import play.api.libs.json.{Format, Json}
 
-final case class NextUrl(value: String)  extends AnyVal derives CanEqual
+final case class NextUrl(value: String) extends AnyVal derives CanEqual
 
 object NextUrl {
   implicit val format: Format[NextUrl] = Json.valueFormat[NextUrl]

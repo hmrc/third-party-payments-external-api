@@ -69,7 +69,7 @@ trait ItSpec
     .overrides(GuiceableModule.fromGuiceModule(overridesModule))
 
   override def fakeApplication(): Application = applicationBuilder().build()
-  
+
   // reusable CanEquals
   given CanEqual[JsValue, JsValue] = CanEqual.derived
 }

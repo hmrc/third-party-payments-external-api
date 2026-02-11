@@ -30,7 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class PayApiService @Inject() (
   payApiConnector:                 PayApiConnector,
   clientJourneyIdGeneratorService: ClientJourneyIdGeneratorService
-)(implicit executionContext: ExecutionContext) extends Logging {
+)(implicit executionContext: ExecutionContext)
+    extends Logging {
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
   def startPaymentJourney(

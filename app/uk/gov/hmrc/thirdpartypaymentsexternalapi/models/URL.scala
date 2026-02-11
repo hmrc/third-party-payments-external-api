@@ -28,12 +28,14 @@ object URL {
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
   private val validUrlReads: Reads[URL] =
     JsPath
-      .read[String](
-        using filterNot[String](JsonValidationError("error.invalidUrl")) { (url: String) => Try(new java.net.URI(url).toURL).isFailure }
+      .read[String](using
+        filterNot[String](JsonValidationError("error.invalidUrl")) { (url: String) =>
+          Try(new java.net.URI(url).toURL).isFailure
+        }
       )
       .map(URL(_))
 
-  val reads: Reads[URL]               = validUrlReads
-  val writes: Writes[URL]             = Json.valueWrites[URL]
+  val reads: Reads[URL]        = validUrlReads
+  val writes: Writes[URL]      = Json.valueWrites[URL]
   given urlFormat: Format[URL] = Format[URL](reads, writes)
 }

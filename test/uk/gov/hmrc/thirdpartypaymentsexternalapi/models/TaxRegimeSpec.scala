@@ -18,7 +18,7 @@ package uk.gov.hmrc.thirdpartypaymentsexternalapi.models
 
 import org.scalatest.AppendedClues.convertToClueful
 import org.scalatest.Assertion
-import play.api.libs.json.{JsString, Json, JsValue}
+import play.api.libs.json.{JsString, JsValue, Json}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.UnitSpec
 
 class TaxRegimeSpec extends UnitSpec {
