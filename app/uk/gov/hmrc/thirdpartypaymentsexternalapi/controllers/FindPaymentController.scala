@@ -15,8 +15,9 @@
  */
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
+import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.config.AppConfig
@@ -34,7 +35,7 @@ class FindPaymentController @Inject() (
   findPaymentService: FindPaymentService,
   appConfig:          AppConfig
 )(implicit executionContext: ExecutionContext)
-    extends BackendController(cc) {
+    extends BackendController(cc) with Logging {
 
   def status(clientJourneyId: ClientJourneyId): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
@@ -45,7 +46,9 @@ class FindPaymentController @Inject() (
         .recover { case e: UpstreamErrorResponse =>
           e.statusCode match {
             case 404 => NotFound
-            case _   => InternalServerError
+            case _   =>
+              logger.error(s"Unexpected error (not a 404) from pay-api when looking up a payment status. Error was: [${e.getMessage}]")
+              InternalServerError
           }
         }
   }

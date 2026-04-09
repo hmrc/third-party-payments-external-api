@@ -44,14 +44,17 @@ trait ItSpec
   implicit val ec: ExecutionContext            = scala.concurrent.ExecutionContext.Implicits.global
   implicit lazy val materializer: Materializer = app.materializer
 
+  // hint: override in specific tests to set bespoke config for that test
+  protected lazy val configOverrides: Map[String, Any] = Map()
+  
   protected lazy val configMap: Map[String, Any] = Map[String, Any](
-    "auditing.enabled"                        -> true,
+    "auditing.enabled"                        -> false,
     "auditing.traceRequests"                  -> false,
     "auditing.consumer.baseUri.port"          -> self.wireMockPort,
     "microservice.services.pay-api.port"      -> self.wireMockPort,
     "microservice.services.open-banking.port" -> self.wireMockPort,
     "internal-auth.token"                     -> "wowow"
-  )
+  ) ++ configOverrides
 
   lazy val overridesModule: AbstractModule = new AbstractModule {
     @Provides

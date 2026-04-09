@@ -30,6 +30,8 @@ class AuditServiceSpec extends ItSpec {
 
   val auditService: AuditService = app.injector.instanceOf[AuditService]
 
+  override lazy val configOverrides: Map[String, Any] = Map("auditing.enabled" -> true)
+
   "AuditService" - {
 
     "should successfully send audit when the journey is not successful and Null values" in {
