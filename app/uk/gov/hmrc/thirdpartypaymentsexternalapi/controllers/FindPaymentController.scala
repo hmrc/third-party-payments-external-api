@@ -47,7 +47,7 @@ class FindPaymentController @Inject() (
           e.statusCode match {
             case 404 => NotFound
             case _   =>
-              logger.error(s"Unexpected error (not a 404) from pay-api when looking up a payment status. Error was: [${e.getMessage}]")
+              logger.error(s"Unexpected error (not a 404) from open-banking when looking up a payment status. Error was: [${e.getMessage}]")
               InternalServerError
           }
         }
