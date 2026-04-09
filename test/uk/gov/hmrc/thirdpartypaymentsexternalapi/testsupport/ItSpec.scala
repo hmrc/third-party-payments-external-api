@@ -46,7 +46,7 @@ trait ItSpec
 
   // hint: override in specific tests to set bespoke config for that test
   protected lazy val configOverrides: Map[String, Any] = Map()
-  
+
   protected lazy val configMap: Map[String, Any] = Map[String, Any](
     "auditing.enabled"                        -> false,
     "auditing.traceRequests"                  -> false,

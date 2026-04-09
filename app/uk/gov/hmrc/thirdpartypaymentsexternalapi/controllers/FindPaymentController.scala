@@ -35,7 +35,8 @@ class FindPaymentController @Inject() (
   findPaymentService: FindPaymentService,
   appConfig:          AppConfig
 )(implicit executionContext: ExecutionContext)
-    extends BackendController(cc) with Logging {
+    extends BackendController(cc)
+    with Logging {
 
   def status(clientJourneyId: ClientJourneyId): Action[AnyContent] = Action.async {
     implicit request: Request[AnyContent] =>
@@ -47,7 +48,9 @@ class FindPaymentController @Inject() (
           e.statusCode match {
             case 404 => NotFound
             case _   =>
-              logger.error(s"Unexpected error (not a 404) from open-banking when looking up a payment status. Error was: [${e.getMessage}]")
+              logger.error(
+                s"Unexpected error (not a 404) from open-banking when looking up a payment status. Error was: [${e.getMessage}]"
+              )
               InternalServerError
           }
         }
