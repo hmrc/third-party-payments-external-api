@@ -6,7 +6,7 @@ StrictBuilding.strictBuildingSetting
 //---
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "3.7.4"
+ThisBuild / scalaVersion := "3.3.7"
 
 lazy val microservice = Project("third-party-payments-external-api", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)

@@ -3,12 +3,12 @@ import sbt.*
 //format: OFF
 object AppDependencies {
 
-  private val bootstrapVersion = "10.5.0"
+  private val bootstrapVersion = "10.7.0"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"   %% "bootstrap-backend-play-30" % bootstrapVersion,
-    "com.beachape"  %% "enumeratum-play-json"      % "1.9.4",
-    "org.typelevel" %% "cats-effect"               % "3.6.3"
+    "com.beachape"  %% "enumeratum-play-json"      % "1.9.7",
+    "org.typelevel" %% "cats-effect"               % "3.7.0"
   )
 
   val test: Seq[ModuleID] = Seq(

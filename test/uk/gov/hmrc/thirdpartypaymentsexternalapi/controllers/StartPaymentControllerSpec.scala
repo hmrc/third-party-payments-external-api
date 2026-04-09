@@ -33,6 +33,8 @@ class StartPaymentControllerSpec extends ItSpec {
 
   private val startPaymentController = app.injector.instanceOf[StartPaymentController]
 
+  override lazy val configOverrides: Map[String, Any] = Map("auditing.enabled" -> true)
+
   private def testThirdPartyRequest(
     taxRegime:     TaxRegime,
     reference:     Reference,

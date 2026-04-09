@@ -54,9 +54,9 @@ Example response:
 
 ## Requirements
 
-- Scala 2.13.x
-- Java 11
-- sbt 1.9.x
+- Scala 3.3.7
+- Java 21
+- sbt 1.10.10
 - [Service Manager V2](https://github.com/hmrc/sm2)
 
 ## Running locally
