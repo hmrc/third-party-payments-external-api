@@ -16,10 +16,23 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata
 
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, ClientJourneyId, Reference}
 
 import java.util.UUID
 
 object TestData {
   val clientJourneyId: ClientJourneyId = ClientJourneyId(UUID.fromString("aef0f31b-3c0f-454b-9d1f-07d549987a96"))
+
+  val testAmountInPence: AmountInPence = AmountInPence(1234)
+
+  val saUtr: Reference           = Reference("1234567895")
+  val saUtrAppendedK: Reference   = Reference("1234567895K")
+  val saUtrPrependedK: Reference = Reference("K1234567895")
+
+  val vrn: Reference = Reference("999964805")
+
+  val ctReference: Reference = Reference("1097172564")
+
+  val epayeReference: Reference = Reference("123PH45678900")
+
 }

@@ -16,18 +16,23 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.services
 
-import cats.syntax.all._
+import cats.syntax.all.*
+import com.google.inject.Inject
 import jakarta.inject.Singleton
 import play.api.libs.json.{JsPath, JsValue, JsonValidationError}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
 
 @Singleton
-final class ValidationService {
+final class ValidationService @Inject(referenceValidationService: ReferenceValidationService) {
 
   def validateThirdPartyRequest(jsValue: JsValue): Either[Seq[ThirdPartyResponseError], ThirdPartyPayRequest] = {
     jsValue
       .validate[ThirdPartyPayRequest]
       .asEither
+      .fold[Either[collection.Seq[(JsPath, collection.Seq[JsonValidationError])], ThirdPartyPayRequest]](
+        (fa: collection.Seq[(JsPath, collection.Seq[JsonValidationError])]) => Left(fa),
+        thirdPartyPayRequest => referenceValidationService.validateReference(thirdPartyPayRequest)
+      )
       .leftMap(errors => jsErrorToMessagesBetter(errors).map(errorMessageKeyToThirdPartyResponseErrors))
   }
 
@@ -53,6 +58,10 @@ final class ValidationService {
     case "taxRegime.error.path.missing"            => ThirdPartyResponseErrors.TaxRegimeMissingError
     case "reference.error.minLength"               => ThirdPartyResponseErrors.ReferenceInvalidError
     case "reference.error.path.missing"            => ThirdPartyResponseErrors.ReferenceMissingError
+    case "reference.error.saReference.invalid"     => ThirdPartyResponseErrors.ReferenceInvalidSelfAssessmentError
+    case "reference.error.vatReference.invalid"    => ThirdPartyResponseErrors.ReferenceInvalidVatError
+    case "reference.error.ctReference.invalid"     => ThirdPartyResponseErrors.ReferenceInvalidCorporationTaxError
+    case "reference.error.epayeReference.invalid"  => ThirdPartyResponseErrors.ReferenceInvalidEmployersPayAsYouEarnError
     case "amountInPence.error.path.missing"        => ThirdPartyResponseErrors.AmountInPenceMissingError
     case "amountInPence.error.minimumValue"        => ThirdPartyResponseErrors.AmountInPenceInvalidError
     case "backURL.error.invalidUrl"                => ThirdPartyResponseErrors.BackUrlInvalidError

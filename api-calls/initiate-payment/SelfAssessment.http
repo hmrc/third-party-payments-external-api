@@ -7,7 +7,7 @@ Content-Type: Application/Json
 
 {
   "taxRegime": "SelfAssessment",
-  "reference": "1234567891",
+  "reference": "1234567895",
   "amountInPence": 123,
   "friendlyName": "Test Company",
   "backURL": "https://www.someBackUrl.com"
