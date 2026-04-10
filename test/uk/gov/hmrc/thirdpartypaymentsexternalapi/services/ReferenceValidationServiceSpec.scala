@@ -83,19 +83,19 @@ class ReferenceValidationServiceSpec extends UnitSpec {
 
       "for Vat" in {
         val thirdPartyPayRequest = ThirdPartyPayRequest(Vat, Reference("1234567890"), TestData.testAmountInPence, None, None)
-        val result = service.validateReference(thirdPartyPayRequest)
+        val result               = service.validateReference(thirdPartyPayRequest)
         result shouldBe Left(collection.Seq((JsPath \ "reference", collection.Seq(JsonValidationError(Seq("error.vatReference.invalid"))))))
       }
 
       "for CorporationTax" in {
         val thirdPartyPayRequest = ThirdPartyPayRequest(CorporationTax, Reference("1234567890"), TestData.testAmountInPence, None, None)
-        val result = service.validateReference(thirdPartyPayRequest)
+        val result               = service.validateReference(thirdPartyPayRequest)
         result shouldBe Left(collection.Seq((JsPath \ "reference", collection.Seq(JsonValidationError(Seq("error.ctReference.invalid"))))))
       }
 
       "for EmployersPayAsYouEarn" in {
         val thirdPartyPayRequest = ThirdPartyPayRequest(EmployersPayAsYouEarn, Reference("1234567890"), TestData.testAmountInPence, None, None)
-        val result = service.validateReference(thirdPartyPayRequest)
+        val result               = service.validateReference(thirdPartyPayRequest)
         result shouldBe Left(collection.Seq((JsPath \ "reference", collection.Seq(JsonValidationError(Seq("error.epayeReference.invalid"))))))
       }
     }

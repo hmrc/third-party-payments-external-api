@@ -106,7 +106,7 @@ class ValidationServiceSpec extends UnitSpec {
     }
 
     "return the correct ThirdPartyResponse for given keys" in {
-      
+
       service.errorMessageKeyToThirdPartyResponseErrors(
         "friendlyName.error.invalidCharacters"
       ) shouldBe ThirdPartyResponseErrors.FriendlyNameInvalidCharacterError

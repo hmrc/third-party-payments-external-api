@@ -23,7 +23,7 @@ import play.api.libs.json.{JsPath, JsValue, JsonValidationError}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
 
 @Singleton
-final class ValidationService @Inject(referenceValidationService: ReferenceValidationService) {
+final class ValidationService @Inject (referenceValidationService: ReferenceValidationService) {
 
   def validateThirdPartyRequest(jsValue: JsValue): Either[Seq[ThirdPartyResponseError], ThirdPartyPayRequest] = {
     jsValue

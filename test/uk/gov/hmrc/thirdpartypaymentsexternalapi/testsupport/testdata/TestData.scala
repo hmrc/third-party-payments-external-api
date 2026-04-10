@@ -26,7 +26,7 @@ object TestData {
   val testAmountInPence: AmountInPence = AmountInPence(1234)
 
   val saUtr: Reference           = Reference("1234567895")
-  val saUtrAppendedK: Reference   = Reference("1234567895K")
+  val saUtrAppendedK: Reference  = Reference("1234567895K")
   val saUtrPrependedK: Reference = Reference("K1234567895")
 
   val vrn: Reference = Reference("999964805")

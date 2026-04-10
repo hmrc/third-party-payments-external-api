@@ -54,7 +54,7 @@ class StartPaymentControllerSpec extends ItSpec {
     taxRegime:       String,
     clientJourneyId: Option[ClientJourneyId],
     errorMessages:   Option[String],
-    reference: Reference
+    reference:       Reference
   ): JsObject = {
 
     val maybeClientJourneyId: String =
@@ -106,7 +106,7 @@ class StartPaymentControllerSpec extends ItSpec {
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("SelfAssessment", Some(clientJourneyId), None,TestData.saUtr)
+          auditJson("SelfAssessment", Some(clientJourneyId), None, TestData.saUtr)
         )
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
@@ -127,7 +127,7 @@ class StartPaymentControllerSpec extends ItSpec {
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("CorporationTax", Some(clientJourneyId), None,TestData.ctReference)
+          auditJson("CorporationTax", Some(clientJourneyId), None, TestData.ctReference)
         )
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
@@ -139,7 +139,7 @@ class StartPaymentControllerSpec extends ItSpec {
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("EmployersPayAsYouEarn", Some(clientJourneyId), None,TestData.epayeReference)
+          auditJson("EmployersPayAsYouEarn", Some(clientJourneyId), None, TestData.epayeReference)
         )
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
@@ -154,7 +154,7 @@ class StartPaymentControllerSpec extends ItSpec {
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("SelfAssessment", None, Some("Error from upstream."),TestData.saUtr)
+          auditJson("SelfAssessment", None, Some("Error from upstream."), TestData.saUtr)
         )
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
@@ -164,7 +164,7 @@ class StartPaymentControllerSpec extends ItSpec {
         val result = startPaymentController.pay()(fakeRequest(taxRegime = Vat, reference = TestData.vrn))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("Vat", None, Some("Error from upstream."),TestData.vrn))
+        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("Vat", None, Some("Error from upstream."), TestData.vrn))
         PayApiStub.verifyStartJourneyVat(count = 1)
       }
 
@@ -175,7 +175,7 @@ class StartPaymentControllerSpec extends ItSpec {
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("CorporationTax", None, Some("Error from upstream."),TestData.ctReference)
+          auditJson("CorporationTax", None, Some("Error from upstream."), TestData.ctReference)
         )
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
@@ -187,7 +187,7 @@ class StartPaymentControllerSpec extends ItSpec {
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("EmployersPayAsYouEarn", None, Some("Error from upstream."),TestData.epayeReference)
+          auditJson("EmployersPayAsYouEarn", None, Some("Error from upstream."), TestData.epayeReference)
         )
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
