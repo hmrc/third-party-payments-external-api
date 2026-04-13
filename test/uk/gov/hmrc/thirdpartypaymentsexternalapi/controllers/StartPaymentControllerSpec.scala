@@ -26,6 +26,7 @@ import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl,
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, ClientJourneyId, FriendlyName, Reference, TaxRegime, URL}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.{AuditConnectorStub, PayApiStub}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.testdata.TestData
 
 import java.util.UUID
 
@@ -52,7 +53,8 @@ class StartPaymentControllerSpec extends ItSpec {
   private def auditJson(
     taxRegime:       String,
     clientJourneyId: Option[ClientJourneyId],
-    errorMessages:   Option[String]
+    errorMessages:   Option[String],
+    reference:       Reference
   ): JsObject = {
 
     val maybeClientJourneyId: String =
@@ -65,13 +67,13 @@ class StartPaymentControllerSpec extends ItSpec {
         s"""
         |{
         |  "outcome" : {
-        |      "isSuccessful" : ${isSuccessful}
-        |      ${maybeErrorMessages}
+        |      "isSuccessful" : $isSuccessful
+        |      $maybeErrorMessages
         |    },
-        |    "taxRegime" : "${taxRegime}",
-        |    "paymentReference" : "1234567895",
+        |    "taxRegime" : "$taxRegime",
+        |    "paymentReference" : "${reference.value}",
         |    "amount" : 1.23
-        |    ${maybeClientJourneyId}
+        |    $maybeClientJourneyId
         |}
         |""".stripMargin
       )
@@ -84,7 +86,7 @@ class StartPaymentControllerSpec extends ItSpec {
 
   private def fakeRequest(
     taxRegime:     TaxRegime,
-    reference:     Reference = Reference("1234567895"),
+    reference:     Reference,
     amountInPence: AmountInPence = AmountInPence(123),
     friendlyName:  Option[FriendlyName] = None,
     backURL:       Option[URL] = None
@@ -99,45 +101,45 @@ class StartPaymentControllerSpec extends ItSpec {
 
       "for Self Assessment" in {
         PayApiStub.stubForStartJourneySelfAssessment()
-        val result = startPaymentController.pay()(fakeRequest(SelfAssessment))
+        val result = startPaymentController.pay()(fakeRequest(taxRegime = SelfAssessment, reference = TestData.saUtr))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("SelfAssessment", Some(clientJourneyId), None)
+          auditJson("SelfAssessment", Some(clientJourneyId), None, TestData.saUtr)
         )
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
 
       "for Vat" in {
         PayApiStub.stubForStartJourneyVat()
-        val result = startPaymentController.pay()(fakeRequest(Vat))
+        val result = startPaymentController.pay()(fakeRequest(taxRegime = Vat, reference = TestData.vrn))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("Vat", Some(clientJourneyId), None))
+        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("Vat", Some(clientJourneyId), None, TestData.vrn))
         PayApiStub.verifyStartJourneyVat(count = 1)
       }
 
       "for Corporation Tax" in {
         PayApiStub.stubForStartJourneyCorporationTax()
-        val result = startPaymentController.pay()(fakeRequest(CorporationTax))
+        val result = startPaymentController.pay()(fakeRequest(taxRegime = CorporationTax, reference = TestData.ctReference))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("CorporationTax", Some(clientJourneyId), None)
+          auditJson("CorporationTax", Some(clientJourneyId), None, TestData.ctReference)
         )
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
 
       "for Employers Pay As You Earn" in {
         PayApiStub.stubForStartJourneyEmployersPayAsYouEarn()
-        val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn))
+        val result = startPaymentController.pay()(fakeRequest(taxRegime = EmployersPayAsYouEarn, reference = TestData.epayeReference))
         status(result) shouldBe Status.CREATED
         contentAsJson(result) shouldBe Json.toJson(expectedTestThirdPartyPayResponse)
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("EmployersPayAsYouEarn", Some(clientJourneyId), None)
+          auditJson("EmployersPayAsYouEarn", Some(clientJourneyId), None, TestData.epayeReference)
         )
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
@@ -147,45 +149,45 @@ class StartPaymentControllerSpec extends ItSpec {
 
       "for Self Assessment" in {
         PayApiStub.stubForStartJourneySelfAssessment5xx()
-        val result = startPaymentController.pay()(fakeRequest(SelfAssessment))
+        val result = startPaymentController.pay()(fakeRequest(taxRegime = SelfAssessment, reference = TestData.saUtr))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("SelfAssessment", None, Some("Error from upstream."))
+          auditJson("SelfAssessment", None, Some("Error from upstream."), TestData.saUtr)
         )
         PayApiStub.verifyStartJourneySelfAssessment(count = 1)
       }
 
       "for Vat" in {
         PayApiStub.stubForStartJourneyVat5xx()
-        val result = startPaymentController.pay()(fakeRequest(Vat))
+        val result = startPaymentController.pay()(fakeRequest(taxRegime = Vat, reference = TestData.vrn))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
-        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("Vat", None, Some("Error from upstream.")))
+        AuditConnectorStub.verifyEventAudited("InitiateJourney", auditJson("Vat", None, Some("Error from upstream."), TestData.vrn))
         PayApiStub.verifyStartJourneyVat(count = 1)
       }
 
       "for Corporation Tax" in {
         PayApiStub.stubForStartJourneyCorporationTax5xx()
-        val result = startPaymentController.pay()(fakeRequest(CorporationTax))
+        val result = startPaymentController.pay()(fakeRequest(taxRegime = CorporationTax, reference = TestData.ctReference))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("CorporationTax", None, Some("Error from upstream."))
+          auditJson("CorporationTax", None, Some("Error from upstream."), TestData.ctReference)
         )
         PayApiStub.verifyStartJourneyCorporationTax(count = 1)
       }
 
       "for Employers Pay As You Earn" in {
         PayApiStub.stubForStartJourneyEmployersPayAsYouEarn5xx()
-        val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn))
+        val result = startPaymentController.pay()(fakeRequest(taxRegime = EmployersPayAsYouEarn, reference = TestData.epayeReference))
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.parse("""{"errors":["Error from upstream."]}""")
         AuditConnectorStub.verifyEventAudited(
           "InitiateJourney",
-          auditJson("EmployersPayAsYouEarn", None, Some("Error from upstream."))
+          auditJson("EmployersPayAsYouEarn", None, Some("Error from upstream."), TestData.epayeReference)
         )
         PayApiStub.verifyStartJourneyEmployersPayAsYouEarn(count = 1)
       }
@@ -216,7 +218,7 @@ class StartPaymentControllerSpec extends ItSpec {
         "is too long (more than 40 characters)" in {
           val stringMoreThan40Characters = "IamMoreThan40Characters123456789123456789"
           val result                     = startPaymentController.pay()(
-            fakeRequest(SelfAssessment, friendlyName = Some(FriendlyName(stringMoreThan40Characters)))
+            fakeRequest(taxRegime = SelfAssessment, reference = TestData.saUtr, friendlyName = Some(FriendlyName(stringMoreThan40Characters)))
           )
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["friendlyName field too long."]}""")
@@ -225,7 +227,7 @@ class StartPaymentControllerSpec extends ItSpec {
         "contains invalid characters " in {
           val stringContainingInvalidCharacter = "invalidcharinthisstring%"
           val result                           = startPaymentController.pay()(
-            fakeRequest(SelfAssessment, friendlyName = Some(FriendlyName(stringContainingInvalidCharacter)))
+            fakeRequest(taxRegime = SelfAssessment, reference = TestData.saUtr, friendlyName = Some(FriendlyName(stringContainingInvalidCharacter)))
           )
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["friendlyName field contains invalid character."]}""")
@@ -280,6 +282,29 @@ class StartPaymentControllerSpec extends ItSpec {
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["Mandatory reference field missing."]}""")
         }
+
+        "is invalid format for" - {
+          "SelfAssessment" in {
+            val result = startPaymentController.pay()(fakeRequest(SelfAssessment, reference = Reference("1234567890")))
+            status(result) shouldBe Status.BAD_REQUEST
+            contentAsJson(result) shouldBe Json.parse("""{"errors":["the SA UTR is not a valid reference."]}""")
+          }
+          "Vat" in {
+            val result = startPaymentController.pay()(fakeRequest(Vat, reference = Reference("1234567890")))
+            status(result) shouldBe Status.BAD_REQUEST
+            contentAsJson(result) shouldBe Json.parse("""{"errors":["the VRN is not a valid reference."]}""")
+          }
+          "CorporationTax" in {
+            val result = startPaymentController.pay()(fakeRequest(CorporationTax, reference = Reference("1234567890")))
+            status(result) shouldBe Status.BAD_REQUEST
+            contentAsJson(result) shouldBe Json.parse("""{"errors":["the CorporationTax reference is not a valid reference."]}""")
+          }
+          "EmployersPayAsYouEarn" in {
+            val result = startPaymentController.pay()(fakeRequest(EmployersPayAsYouEarn, reference = Reference("1234567890")))
+            status(result) shouldBe Status.BAD_REQUEST
+            contentAsJson(result) shouldBe Json.parse("""{"errors":["the EmployersPayAsYouEarn reference is not a valid reference."]}""")
+          }
+        }
       }
 
       "amountInPence" - {
@@ -297,7 +322,7 @@ class StartPaymentControllerSpec extends ItSpec {
 
         "is less than the minimum allowed value (less than 0)" in {
           val negativeAmount = AmountInPence(-1)
-          val result         = startPaymentController.pay()(fakeRequest(SelfAssessment, amountInPence = negativeAmount))
+          val result         = startPaymentController.pay()(fakeRequest(taxRegime = SelfAssessment, reference = TestData.saUtr, amountInPence = negativeAmount))
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse(
             """{"errors":["Mandatory amountInPence field must be greater than or equal to 0."]}"""
@@ -308,7 +333,7 @@ class StartPaymentControllerSpec extends ItSpec {
       "backURL" - {
         "is not a valid url" in {
           val invalidUrl = URL("notavalidurl")
-          val result     = startPaymentController.pay()(fakeRequest(SelfAssessment, backURL = Some(invalidUrl)))
+          val result     = startPaymentController.pay()(fakeRequest(taxRegime = SelfAssessment, reference = TestData.saUtr, backURL = Some(invalidUrl)))
           status(result) shouldBe Status.BAD_REQUEST
           contentAsJson(result) shouldBe Json.parse("""{"errors":["backURL field must be a valid url if provided."]}""")
         }

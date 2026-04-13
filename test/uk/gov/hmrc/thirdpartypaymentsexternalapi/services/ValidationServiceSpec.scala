@@ -28,7 +28,7 @@ class ValidationServiceSpec extends UnitSpec {
     ThirdPartyResponseError
   ], ThirdPartyPayRequest]] = CanEqual.derived
 
-  val service: ValidationService = new ValidationService
+  val service: ValidationService = new ValidationService(new ReferenceValidationService)
 
   "validateThirdPartyRequest" - {
 
@@ -99,38 +99,48 @@ class ValidationServiceSpec extends UnitSpec {
   }
 
   "errorMessageKeyToThirdPartyResponseErrors" - {
+
     "return UnexpectedError with the custom string in when the key can't be found" in {
       service.errorMessageKeyToThirdPartyResponseErrors("i-don't-exist") shouldBe ThirdPartyResponseErrors
         .UnexpectedError("i-don't-exist")
     }
+
     "return the correct ThirdPartyResponse for given keys" in {
+
       service.errorMessageKeyToThirdPartyResponseErrors(
         "friendlyName.error.invalidCharacters"
       ) shouldBe ThirdPartyResponseErrors.FriendlyNameInvalidCharacterError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("friendlyName.error.maxLength") shouldBe ThirdPartyResponseErrors.FriendlyNameTooLongError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("taxRegime.error.expected.validenumvalue") shouldBe ThirdPartyResponseErrors.TaxRegimeInvalidError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("taxRegime.error.path.missing") shouldBe ThirdPartyResponseErrors.TaxRegimeMissingError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("reference.error.minLength") shouldBe ThirdPartyResponseErrors.ReferenceInvalidError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("reference.error.path.missing") shouldBe ThirdPartyResponseErrors.ReferenceMissingError
+
       service.errorMessageKeyToThirdPartyResponseErrors(
-        "friendlyName.error.maxLength"
-      ) shouldBe ThirdPartyResponseErrors.FriendlyNameTooLongError
+        "reference.error.saReference.invalid"
+      ) shouldBe ThirdPartyResponseErrors.ReferenceInvalidSelfAssessmentError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("reference.error.vatReference.invalid") shouldBe ThirdPartyResponseErrors.ReferenceInvalidVatError
+
       service.errorMessageKeyToThirdPartyResponseErrors(
-        "taxRegime.error.expected.validenumvalue"
-      ) shouldBe ThirdPartyResponseErrors.TaxRegimeInvalidError
+        "reference.error.ctReference.invalid"
+      ) shouldBe ThirdPartyResponseErrors.ReferenceInvalidCorporationTaxError
+
       service.errorMessageKeyToThirdPartyResponseErrors(
-        "taxRegime.error.path.missing"
-      ) shouldBe ThirdPartyResponseErrors.TaxRegimeMissingError
-      service.errorMessageKeyToThirdPartyResponseErrors(
-        "reference.error.minLength"
-      ) shouldBe ThirdPartyResponseErrors.ReferenceInvalidError
-      service.errorMessageKeyToThirdPartyResponseErrors(
-        "reference.error.path.missing"
-      ) shouldBe ThirdPartyResponseErrors.ReferenceMissingError
-      service.errorMessageKeyToThirdPartyResponseErrors(
-        "amountInPence.error.path.missing"
-      ) shouldBe ThirdPartyResponseErrors.AmountInPenceMissingError
-      service.errorMessageKeyToThirdPartyResponseErrors(
-        "amountInPence.error.minimumValue"
-      ) shouldBe ThirdPartyResponseErrors.AmountInPenceInvalidError
-      service.errorMessageKeyToThirdPartyResponseErrors(
-        "backURL.error.invalidUrl"
-      ) shouldBe ThirdPartyResponseErrors.BackUrlInvalidError
+        "reference.error.epayeReference.invalid"
+      ) shouldBe ThirdPartyResponseErrors.ReferenceInvalidEmployersPayAsYouEarnError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("amountInPence.error.path.missing") shouldBe ThirdPartyResponseErrors.AmountInPenceMissingError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("amountInPence.error.minimumValue") shouldBe ThirdPartyResponseErrors.AmountInPenceInvalidError
+
+      service.errorMessageKeyToThirdPartyResponseErrors("backURL.error.invalidUrl") shouldBe ThirdPartyResponseErrors.BackUrlInvalidError
+
     }
   }
 

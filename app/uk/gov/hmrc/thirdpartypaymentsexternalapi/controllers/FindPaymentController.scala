@@ -38,22 +38,21 @@ class FindPaymentController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def status(clientJourneyId: ClientJourneyId): Action[AnyContent] = Action.async {
-    implicit request: Request[AnyContent] =>
-      getStatus(request, clientJourneyId)
-        .map { response =>
-          Ok(Json.toJson(response))
+  def status(clientJourneyId: ClientJourneyId): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+    getStatus(request, clientJourneyId)
+      .map { response =>
+        Ok(Json.toJson(response))
+      }
+      .recover { case e: UpstreamErrorResponse =>
+        e.statusCode match {
+          case 404 => NotFound
+          case _   =>
+            logger.error(
+              s"Unexpected error (not a 404) from open-banking when looking up a payment status. Error was: [${e.getMessage}]"
+            )
+            InternalServerError
         }
-        .recover { case e: UpstreamErrorResponse =>
-          e.statusCode match {
-            case 404 => NotFound
-            case _   =>
-              logger.error(
-                s"Unexpected error (not a 404) from open-banking when looking up a payment status. Error was: [${e.getMessage}]"
-              )
-              InternalServerError
-          }
-        }
+      }
   }
 
   private def getStatus(request: Request[AnyContent], clientJourneyId: ClientJourneyId)(implicit

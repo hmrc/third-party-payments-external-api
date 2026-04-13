@@ -33,13 +33,7 @@ import java.util.UUID
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 
-trait ItSpec
-    extends AnyFreeSpecLike
-    with GuiceOneServerPerSuite
-    with ScalaFutures
-    with IntegrationPatience
-    with WireMockSupport
-    with Matchers { self =>
+trait ItSpec extends AnyFreeSpecLike with GuiceOneServerPerSuite with ScalaFutures with IntegrationPatience with WireMockSupport with Matchers { self =>
 
   implicit val ec: ExecutionContext            = scala.concurrent.ExecutionContext.Implicits.global
   implicit lazy val materializer: Materializer = app.materializer

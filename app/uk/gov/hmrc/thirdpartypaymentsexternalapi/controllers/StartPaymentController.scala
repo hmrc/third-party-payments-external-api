@@ -93,7 +93,6 @@ class StartPaymentController @Inject() (
       BadRequest(createErrorResponses(errors))
   }
 
-  private def createErrorResponses: Seq[ThirdPartyResponseError] => JsObject = e =>
-    Json.obj("errors" -> Json.toJson(e.map(_.errorMessage)))
+  private def createErrorResponses: Seq[ThirdPartyResponseError] => JsObject = e => Json.obj("errors" -> Json.toJson(e.map(_.errorMessage)))
 
 }

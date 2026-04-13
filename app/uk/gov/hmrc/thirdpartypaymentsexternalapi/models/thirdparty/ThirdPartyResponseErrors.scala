@@ -21,40 +21,52 @@ sealed trait ThirdPartyResponseError derives CanEqual {
 }
 
 object ThirdPartyResponseErrors {
-  case object UpstreamError                             extends ThirdPartyResponseError {
+  case object UpstreamError                              extends ThirdPartyResponseError {
     val errorMessage = "Error from upstream."
   }
-  case object FriendlyNameInvalidCharacterError         extends ThirdPartyResponseError {
+  case object FriendlyNameInvalidCharacterError          extends ThirdPartyResponseError {
     val errorMessage = "friendlyName field contains invalid character."
   }
-  case object FriendlyNameTooLongError                  extends ThirdPartyResponseError {
+  case object FriendlyNameTooLongError                   extends ThirdPartyResponseError {
     val errorMessage = "friendlyName field too long."
   }
-  case object TaxRegimeMissingError                     extends ThirdPartyResponseError {
+  case object TaxRegimeMissingError                      extends ThirdPartyResponseError {
     val errorMessage: String = "Mandatory taxRegime field missing."
   }
-  case object TaxRegimeInvalidError                     extends ThirdPartyResponseError {
+  case object TaxRegimeInvalidError                      extends ThirdPartyResponseError {
     val errorMessage: String = "Mandatory taxRegime is not in list of acceptable values."
   }
-  case object ReferenceMissingError                     extends ThirdPartyResponseError {
+  case object ReferenceMissingError                      extends ThirdPartyResponseError {
     val errorMessage: String = "Mandatory reference field missing."
   }
-  case object ReferenceInvalidError                     extends ThirdPartyResponseError {
+  case object ReferenceInvalidError                      extends ThirdPartyResponseError {
     val errorMessage: String = "Mandatory reference field invalid."
   }
-  case object AmountInPenceMissingError                 extends ThirdPartyResponseError {
+  case object ReferenceInvalidSelfAssessmentError        extends ThirdPartyResponseError {
+    val errorMessage: String = "the SA UTR is not a valid reference."
+  }
+  case object ReferenceInvalidVatError                   extends ThirdPartyResponseError {
+    val errorMessage: String = "the VRN is not a valid reference."
+  }
+  case object ReferenceInvalidCorporationTaxError        extends ThirdPartyResponseError {
+    val errorMessage: String = "the CorporationTax reference is not a valid reference."
+  }
+  case object ReferenceInvalidEmployersPayAsYouEarnError extends ThirdPartyResponseError {
+    val errorMessage: String = "the EmployersPayAsYouEarn reference is not a valid reference."
+  }
+  case object AmountInPenceMissingError                  extends ThirdPartyResponseError {
     val errorMessage: String = "Mandatory amountInPence field missing."
   }
-  case object AmountInPenceInvalidError                 extends ThirdPartyResponseError {
+  case object AmountInPenceInvalidError                  extends ThirdPartyResponseError {
     val errorMessage: String = "Mandatory amountInPence field must be greater than or equal to 0."
   }
-  case object BackUrlInvalidError                       extends ThirdPartyResponseError {
+  case object BackUrlInvalidError                        extends ThirdPartyResponseError {
     val errorMessage: String = "backURL field must be a valid url if provided."
   }
-  case object NonJsonBodyError                          extends ThirdPartyResponseError {
+  case object NonJsonBodyError                           extends ThirdPartyResponseError {
     val errorMessage: String = "Request body was not json"
   }
-  final case class UnexpectedError(extraReason: String) extends ThirdPartyResponseError {
+  final case class UnexpectedError(extraReason: String)  extends ThirdPartyResponseError {
     val errorMessage: String = "An unexpected error occurred: " + extraReason
   }
 }
