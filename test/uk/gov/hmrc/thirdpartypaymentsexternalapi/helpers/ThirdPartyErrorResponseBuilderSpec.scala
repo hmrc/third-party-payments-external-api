@@ -101,4 +101,3 @@ class ThirdPartyErrorResponseBuilderSpec extends ItSpec with TableDrivenProperty
     }
   }
 }
-

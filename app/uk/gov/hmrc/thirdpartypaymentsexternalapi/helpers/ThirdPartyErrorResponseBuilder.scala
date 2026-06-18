@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.helpers
 
-
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{Result, Results}
 import uk.gov.hmrc.http.UpstreamErrorResponse

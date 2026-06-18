@@ -362,5 +362,4 @@ class StartPaymentControllerSpec extends ItSpec {
 
   }
 
-
 }

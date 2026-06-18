@@ -107,16 +107,16 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
         result.failed.futureValue shouldBe a[Exception]
       }
 
-       "should return 500 InternalServerError when an exception is thrown" in {
-         val result = findPaymentController.status(clientJourneyId)(
-           fakeRequest.withHeaders(("Gov-Test-Scenario", "UPSTREAM_ERROR"))
-         )
+      "should return 500 InternalServerError when an exception is thrown" in {
+        val result = findPaymentController.status(clientJourneyId)(
+          fakeRequest.withHeaders(("Gov-Test-Scenario", "UPSTREAM_ERROR"))
+        )
 
-         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-         contentAsJson(result) shouldBe Json.parse(
-           """{"error":"upstream error: could be anything"}"""
-         )
-       }
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.parse(
+          """{"error":"upstream error: could be anything"}"""
+        )
+      }
     }
   }
 
