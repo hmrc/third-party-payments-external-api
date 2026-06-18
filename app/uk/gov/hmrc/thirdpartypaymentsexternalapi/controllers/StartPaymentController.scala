@@ -19,6 +19,7 @@ import play.api.Logging
 import play.api.libs.json.*
 import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.helpers.ThirdPartyErrorResponseBuilder
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{ThirdPartyPayRequest, ThirdPartyResponseError, ThirdPartyResponseErrors}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.{AuditService, PayApiService, ValidationService}
 
@@ -56,7 +57,7 @@ class StartPaymentController @Inject() (
           rawJson = request.body.asJson,
           maybeClientJourneyId = None
         )
-        Future.successful(thirdPartyResponseErrorToResult(value))
+        Future.successful(ThirdPartyErrorResponseBuilder.fromThirdPartyErrors(value))
       case Right(value) =>
         payApiService
           .startPaymentJourney(value)
@@ -68,7 +69,7 @@ class StartPaymentController @Inject() (
                 rawJson = request.body.asJson,
                 maybeClientJourneyId = None
               )
-              thirdPartyResponseErrorToResult(Seq(error))
+              ThirdPartyErrorResponseBuilder.fromThirdPartyErrors(Seq(error))
             case Right(thirdPartyPayResponse) =>
               auditService.auditInitiateJourneyResult(
                 isSuccessful = true,
@@ -80,19 +81,5 @@ class StartPaymentController @Inject() (
           }
     }
   }
-
-  // Just return an Internal server error if any of the errors are related to that, else BadRequest with list of errors
-  def thirdPartyResponseErrorToResult(errors: Seq[ThirdPartyResponseError]): Result = {
-    val maybeInternalServerError: Seq[ThirdPartyResponseError] = errors.collect {
-      case e @ ThirdPartyResponseErrors.UnexpectedError(_) => e
-      case e @ ThirdPartyResponseErrors.UpstreamError      => e
-    }
-    if (maybeInternalServerError.nonEmpty)
-      InternalServerError(createErrorResponses(errors))
-    else
-      BadRequest(createErrorResponses(errors))
-  }
-
-  private def createErrorResponses: Seq[ThirdPartyResponseError] => JsObject = e => Json.obj("errors" -> Json.toJson(e.map(_.errorMessage)))
-
+  
 }
