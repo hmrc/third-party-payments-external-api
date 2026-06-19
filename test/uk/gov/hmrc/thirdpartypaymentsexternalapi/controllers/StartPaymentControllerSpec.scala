@@ -17,12 +17,12 @@
 package uk.gov.hmrc.thirdpartypaymentsexternalapi.controllers
 
 import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.{AnyContentAsJson, Result, Results}
+import play.api.mvc.AnyContentAsJson
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
 import play.mvc.Http.Status
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.TaxRegime.{CorporationTax, EmployersPayAsYouEarn, SelfAssessment, Vat}
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse, ThirdPartyResponseErrors}
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.{RedirectUrl, ThirdPartyPayRequest, ThirdPartyPayResponse}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.{AmountInPence, ClientJourneyId, FriendlyName, Reference, TaxRegime, URL}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.ItSpec
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.testsupport.stubs.{AuditConnectorStub, PayApiStub}
@@ -193,6 +193,26 @@ class StartPaymentControllerSpec extends ItSpec {
       }
     }
 
+    "return an InternalServerError with UnexpectedError message when pay-api returns a non-upstream error" in {
+      PayApiStub.stubForStartJourneySelfAssessment3xx()
+      val result = startPaymentController.pay()(fakeRequest(taxRegime = SelfAssessment, reference = TestData.saUtr))
+
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      contentAsJson(result) shouldBe Json.parse(
+        """{"errors":["An unexpected error occurred: error when trying to start a journey upstream."]}"""
+      )
+      AuditConnectorStub.verifyEventAudited(
+        "InitiateJourney",
+        auditJson(
+          "SelfAssessment",
+          None,
+          Some("An unexpected error occurred: error when trying to start a journey upstream."),
+          TestData.saUtr
+        )
+      )
+      PayApiStub.verifyStartJourneySelfAssessment(count = 1)
+    }
+
     "return a BadRequest with NonJsonBodyError message when body is not valid json" in {
       val result = startPaymentController.pay()(FakeRequest().withBody("somestringthatisn'tjson"))
       status(result) shouldBe Status.BAD_REQUEST
@@ -340,13 +360,6 @@ class StartPaymentControllerSpec extends ItSpec {
       }
     }
 
-  }
-
-  "thirdPartyResponseErrorToResult should throw an InternalServer error when given a ThirdPartyResponseErrors.UnexpectedError(_)" in {
-    val result: Result = startPaymentController.thirdPartyResponseErrorToResult(
-      Seq(ThirdPartyResponseErrors.UnexpectedError("some reason"))
-    )
-    result.header.status shouldBe Results.InternalServerError.header.status
   }
 
 }

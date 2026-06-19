@@ -21,7 +21,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.config.AppConfig
-import uk.gov.hmrc.thirdpartypaymentsexternalapi.helpers.ExternalTest
+import uk.gov.hmrc.thirdpartypaymentsexternalapi.helpers.{ExternalTest, ThirdPartyErrorResponseBuilder}
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.ClientJourneyId
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.models.thirdparty.ThirdPartySoftwareFindByClientIdResponse
 import uk.gov.hmrc.thirdpartypaymentsexternalapi.services.FindPaymentService
@@ -44,14 +44,7 @@ class FindPaymentController @Inject() (
         Ok(Json.toJson(response))
       }
       .recover { case e: UpstreamErrorResponse =>
-        e.statusCode match {
-          case 404 => NotFound
-          case _   =>
-            logger.error(
-              s"Unexpected error (not a 404) from open-banking when looking up a payment status. Error was: [${e.getMessage}]"
-            )
-            InternalServerError
-        }
+        ThirdPartyErrorResponseBuilder.fromUpstreamError(e)
       }
   }
 

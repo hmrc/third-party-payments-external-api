@@ -56,6 +56,7 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
       val result = findPaymentController.status(clientJourneyId)(fakeRequest)
 
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "error").toOption should not be empty
     }
 
     "return 404 Not Found when OpenBanking returns 404" in {
@@ -64,6 +65,7 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
       val result = findPaymentController.status(clientJourneyId)(fakeRequest)
 
       status(result) shouldBe Status.NOT_FOUND
+      (contentAsJson(result) \ "error").toOption should not be empty
     }
   }
 
@@ -111,6 +113,9 @@ class FindPaymentControllerSpec extends ItSpec with TableDrivenPropertyChecks {
         )
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.parse(
+          """{"error":"upstream error: could be anything"}"""
+        )
       }
     }
   }
